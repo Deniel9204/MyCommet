@@ -61,6 +61,12 @@ class RoomQuickAccessMenu {
             action: (context) =>
                 calls.startCall(room.identifier, CallType.voice),
             icon: Icons.call),
+      if (canCall)
+        RoomQuickAccessMenuEntry(
+            name: "Video Call",
+            action: (context) =>
+                calls.startCall(room.identifier, CallType.video),
+            icon: Icons.videocam),
       if (preferences.hideRoomSidePanel.value == false ||
           MediaQuery.of(context).mobile) ...[
         if (calendar?.hasCalendar == true && calendar?.isCalendarRoom == false)
