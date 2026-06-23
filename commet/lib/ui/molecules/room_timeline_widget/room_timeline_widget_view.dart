@@ -644,8 +644,7 @@ class RoomTimelineWidgetViewState extends State<RoomTimelineWidgetView> {
         // Auto-clear the highlight so a jumped-to message doesn't stay
         // selected until the next jump or leaving the room (#52).
         highlightClearTimer?.cancel();
-        highlightClearTimer =
-            Timer(const Duration(seconds: 5), clearHighlight);
+        highlightClearTimer = Timer(const Duration(seconds: 5), clearHighlight);
       }
 
       var boundsSize = stackKey.globalPaintBounds?.height;

@@ -37,7 +37,8 @@ enum TimeFormatPreference {
 /// This is a pure function (no Flutter dependency) so it can be unit tested
 /// directly; callers resolve [use24Hour] from the user preference and, when
 /// that preference is "follow system", from `MediaQuery.alwaysUse24HourFormat`.
-String formatTimeOfDay(DateTime time, {required bool use24Hour, String? locale}) {
+String formatTimeOfDay(DateTime time,
+    {required bool use24Hour, String? locale}) {
   final format = use24Hour ? DateFormat.Hm(locale) : DateFormat.jm(locale);
   return format.format(time);
 }

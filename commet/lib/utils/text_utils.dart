@@ -167,8 +167,8 @@ class TextUtils {
     var difference = DateTime.now().difference(time);
 
     if (difference.inDays == 0) {
-      final use24Hour = switch (TimeFormatPreference.fromStorage(
-          preferences.timeFormat.value)) {
+      final use24Hour = switch (
+          TimeFormatPreference.fromStorage(preferences.timeFormat.value)) {
         TimeFormatPreference.twelveHour => false,
         TimeFormatPreference.twentyFourHour => true,
         TimeFormatPreference.system =>
