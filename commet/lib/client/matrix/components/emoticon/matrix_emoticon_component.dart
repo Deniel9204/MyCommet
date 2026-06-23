@@ -23,7 +23,11 @@ class MatrixEmoticonComponent extends EmoticonComponent<MatrixClient> {
   final StreamController<void> _onStateChanged = StreamController.broadcast();
 
   @override
-  bool get canCreatePack => ownedPacks.isEmpty;
+  // Multiple personal packs are supported (createEmoticonPack assigns each its
+  // own state key), so allow creating/importing more than one. Previously this
+  // returned ownedPacks.isEmpty, which hid the create/import buttons after the
+  // first pack was created (#39).
+  bool get canCreatePack => true;
 
   @override
   MatrixClient client;
