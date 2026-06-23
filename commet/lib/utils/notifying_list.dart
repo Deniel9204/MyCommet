@@ -215,10 +215,10 @@ class NotifyingList<T> implements INotifyingList<T> {
 
   @override
   void insertAll(int index, Iterable<T> iterable) {
-    int oldLength = iterable.length;
+    final count = iterable.length;
     _internalList.insertAll(index, iterable);
-    for (int i = 0; i < oldLength; i++) {
-      _onAdd.add(_internalList[oldLength + i]);
+    for (int i = 0; i < count; i++) {
+      _onAdd.add(_internalList[index + i]);
     }
   }
 
@@ -287,10 +287,7 @@ class NotifyingList<T> implements INotifyingList<T> {
 
   @override
   void removeRange(int start, int end) {
-    List removed = List.empty(growable: true);
-    for (int i = start; i < end; i++) {
-      removed.add(i);
-    }
+    final removed = _internalList.sublist(start, end);
     _internalList.removeRange(start, end);
     for (final e in removed) {
       _onRemove.add(e);
