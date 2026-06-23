@@ -66,6 +66,11 @@ ClientManager? clientManager;
 
 bool isHeadless = false;
 
+/// Guards flutter_rust_bridge against double initialization within a single
+/// process (the integration-test suite re-runs initNecessary per test, and
+/// RustLib.init() throws "Should not initialize ... twice" otherwise).
+bool _rustLibInitialized = false;
+
 Future<void>? loading;
 
 List<String> commandLineArgs = [];
@@ -206,8 +211,10 @@ Future<void> initNecessary() async {
   await preferences.init();
   await initDatabaseServer();
 
-  if (PlatformUtils.isWindows || PlatformUtils.isLinux) {
+  if ((PlatformUtils.isWindows || PlatformUtils.isLinux) &&
+      !_rustLibInitialized) {
     await RustLib.init();
+    _rustLibInitialized = true;
   }
 
   fileCache = FileCache.getFileCacheInstance();
@@ -234,13 +241,17 @@ Future<void> initGuiRequirements() async {
 
   var locale = PlatformDispatcher.instance.locale;
 
-  Future.wait([
-    UnicodeEmojis.load(),
-    if (!preferences.debugTranslations.value)
-      initializeMessages(locale.languageCode),
-    if (preferences.debugTranslations.value) initializeMessagesDebug(),
-    initializeDateFormatting(locale.languageCode),
-  ]);
+  try {
+    await Future.wait([
+      UnicodeEmojis.load(),
+      if (!preferences.debugTranslations.value)
+        initializeMessages(locale.languageCode),
+      if (preferences.debugTranslations.value) initializeMessagesDebug(),
+      initializeDateFormatting(locale.languageCode),
+    ]);
+  } catch (e) {
+    Log.w("Non-fatal error initializing localization/emoji: $e");
+  }
 
   tiamat.getAppScale = () {
     return preferences.appScale.value;

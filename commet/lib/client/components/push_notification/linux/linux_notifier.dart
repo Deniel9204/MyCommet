@@ -46,7 +46,7 @@ class LinuxNotifier implements Notifier {
 
   static int notificationId = 0;
 
-  late LinuxServerCapabilities capabilities;
+  LinuxServerCapabilities? capabilities;
 
   final service = LauncherEntryService(
       appUri: 'application://chat.commet.commetapp.desktop');
@@ -124,7 +124,13 @@ class LinuxNotifier implements Notifier {
         initializationSettingsLinux,
         onDidReceiveNotificationResponse: notificationResponse);
 
-    capabilities = await flutterLocalNotificationsPlugin!.getCapabilities();
+    try {
+      capabilities = await flutterLocalNotificationsPlugin!.getCapabilities();
+    } catch (e) {
+      // The notification D-Bus service may be unavailable (headless / CI);
+      // degrade gracefully rather than throwing.
+      Log.w("Could not query notification capabilities: $e");
+    }
 
     clientManager!.directMessages.highlightedRoomsList.onListUpdated
         .listen((_) => updateBadgeCount());
@@ -193,7 +199,7 @@ class LinuxNotifier implements Notifier {
           channels: 4)),
       defaultActionName: openRoom,
       actions: [
-        if (capabilities.otherCapabilities.contains("inline-reply"))
+        if (capabilities?.otherCapabilities.contains("inline-reply") == true)
           LinuxNotificationAction(key: "inline-reply", label: "Reply")
       ],
       customHints: [
