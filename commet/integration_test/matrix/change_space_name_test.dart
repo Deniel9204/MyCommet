@@ -10,6 +10,7 @@ import 'package:integration_test/integration_test.dart';
 
 import 'package:tiamat/tiamat.dart' as tiamat;
 import '../extensions/common_flows.dart';
+import '../extensions/wait_for.dart';
 import 'package:commet/generated/l10n.dart';
 
 void main() {
@@ -38,14 +39,21 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField), newName);
+    await tester.pumpAndSettle();
 
     await tester.tap(find.widgetWithIcon(tiamat.IconButton, Icons.check));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(DesktopSettingsPageState.backButtonKey));
-
     await tester.pumpAndSettle();
 
     expect(space.displayName, equals(newName));
+
+    // The space header rebuilds in response to the space's onUpdate stream,
+    // which fires after the (async) rename round-trip completes, so wait for
+    // the new name to appear rather than asserting immediately.
+    await tester.waitFor(
+        () => find.widgetWithText(SpaceHeader, newName).evaluate().isNotEmpty);
 
     expect(find.widgetWithText(SpaceHeader, newName).evaluate().isNotEmpty,
         isTrue);
@@ -53,12 +61,26 @@ void main() {
 }
 
 Future<void> _selectSpace(WidgetTester tester) async {
+  // Spaces are loaded from the client asynchronously after login, so the side
+  // navigation bar may not have rendered any SpaceIcon yet. Wait for at least
+  // one to appear before tapping it.
+  await tester.waitFor(() => find.byType(SpaceIcon).evaluate().isNotEmpty);
+
   await tester.tap(find.byType(SpaceIcon).first);
   await tester.pumpAndSettle();
 }
 
 Future<void> _openSpaceSettings(WidgetTester tester) async {
-  await tester.tap(find.byKey(SpaceSummaryViewState.spaceSettingsButtonKey));
+  // SpaceSummaryView reuses the same key for both the invite button and the
+  // settings button, and when the user can invite members both are rendered.
+  // The settings button is built last in the row, so take the last match.
+  await tester.waitFor(() => find
+      .byKey(SpaceSummaryViewState.spaceSettingsButtonKey)
+      .evaluate()
+      .isNotEmpty);
+
+  await tester
+      .tap(find.byKey(SpaceSummaryViewState.spaceSettingsButtonKey).last);
   await tester.pumpAndSettle();
 }
 
