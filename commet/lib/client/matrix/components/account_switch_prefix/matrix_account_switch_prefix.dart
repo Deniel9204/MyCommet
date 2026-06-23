@@ -1,4 +1,5 @@
 import 'package:commet/client/client.dart';
+import 'package:commet/client/components/account_switch_prefix/account_prefix.dart';
 import 'package:commet/client/components/account_switch_prefix/account_switch_prefix.dart';
 import 'package:commet/client/matrix/matrix_client.dart';
 import 'package:commet/debug/log.dart';
@@ -72,10 +73,12 @@ class MatrixAccountSwitchComponent extends AccountSwitchPrefix<MatrixClient> {
     final bundles = client.matrixClient.accountData[accountDataKey];
     final content = bundles?.content ?? {};
 
-    if (prefix == null || prefix == "") {
+    // Preserve a trailing space if the user wants one; only clear when blank.
+    final normalized = normalizeAccountPrefix(prefix);
+    if (normalized == null) {
       content.remove("prefix");
     } else {
-      content["prefix"] = prefix.trim();
+      content["prefix"] = normalized;
     }
 
     await client.matrixClient
