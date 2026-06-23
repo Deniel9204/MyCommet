@@ -26,6 +26,7 @@ import 'package:commet/client/components/gif/gif_search_result.dart';
 import 'package:commet/utils/autofill_utils.dart';
 import 'package:commet/utils/debounce.dart';
 import 'package:commet/utils/enter_key_action.dart';
+import 'package:commet/utils/markdown_wrap.dart';
 import 'package:commet/utils/event_bus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
@@ -1356,35 +1357,65 @@ class MessageInputState extends State<MessageInput> {
 
   Widget contextMenuBuilder(
       BuildContext buildContext, EditableTextState editableTextState) {
-    return AdaptiveTextSelectionToolbar.editable(
+    // Start from the default editable items, preserving the custom paste
+    // behavior (image-from-clipboard on desktop).
+    final items = editableTextState.contextMenuButtonItems.map((item) {
+      if (item.type == ContextMenuButtonType.paste) {
+        return ContextMenuButtonItem(
+          type: ContextMenuButtonType.paste,
+          onPressed: () async {
+            var clipboard = await Clipboard.getData("text/plain");
+            if (clipboard != null) {
+              return editableTextState.pasteText(SelectionChangedCause.toolbar);
+            }
+            editableTextState.hideToolbar();
+            if (BuildConfig.DESKTOP) {
+              await readImageFromClipboard();
+            }
+          },
+        );
+      }
+      return item;
+    }).toList();
+
+    // Add markdown formatting actions when there is a non-empty selection.
+    final selection = controller.selection;
+    if (selection.isValid && !selection.isCollapsed) {
+      for (final entry in const [
+        ("Bold", "**"),
+        ("Italic", "_"),
+        ("Code", "`"),
+      ]) {
+        items.add(ContextMenuButtonItem(
+          label: entry.$1,
+          onPressed: () {
+            editableTextState.hideToolbar();
+            applyMarkdownWrap(entry.$2);
+          },
+        ));
+      }
+    }
+
+    return AdaptiveTextSelectionToolbar.buttonItems(
       anchors: editableTextState.contextMenuAnchors,
-      clipboardStatus: ClipboardStatus.pasteable,
-      // to apply the normal behavior when click on copy (copy in clipboard close toolbar)
-      // use an empty function `() {}` to hide this option from the toolbar
-      onCopy: () =>
-          editableTextState.copySelection(SelectionChangedCause.toolbar),
-      // to apply the normal behavior when click on cut
-      onCut: () =>
-          editableTextState.cutSelection(SelectionChangedCause.toolbar),
-      onPaste: () async {
-        var clipboard = await Clipboard.getData("text/plain");
-
-        if (clipboard != null) {
-          return editableTextState.pasteText(SelectionChangedCause.toolbar);
-        }
-
-        editableTextState.hideToolbar();
-
-        if (BuildConfig.DESKTOP) {
-          await readImageFromClipboard();
-        }
-      },
-      // to apply the normal behavior when click on select all
-      onSelectAll: () =>
-          editableTextState.selectAll(SelectionChangedCause.toolbar),
-      onLiveTextInput: null, onLookUp: null, onSearchWeb: null,
-      onShare: null,
+      buttonItems: items,
     );
+  }
+
+  /// Wraps (or unwraps) the current composer selection with a markdown [marker].
+  void applyMarkdownWrap(String marker) {
+    final selection = controller.selection;
+    if (!selection.isValid) return;
+    final result =
+        wrapSelection(controller.text, selection.start, selection.end, marker);
+    controller.value = TextEditingValue(
+      text: result.text,
+      selection: TextSelection(
+        baseOffset: result.selectionStart,
+        extentOffset: result.selectionEnd,
+      ),
+    );
+    onTextfieldUpdated(controller.text);
   }
 
   Future<void> readImageFromClipboard() async {
