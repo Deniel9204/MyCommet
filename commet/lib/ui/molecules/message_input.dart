@@ -25,6 +25,7 @@ import 'package:commet/client/components/emoticon/emoji_pack.dart';
 import 'package:commet/client/components/gif/gif_search_result.dart';
 import 'package:commet/utils/autofill_utils.dart';
 import 'package:commet/utils/debounce.dart';
+import 'package:commet/utils/enter_key_action.dart';
 import 'package:commet/utils/event_bus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
@@ -610,17 +611,25 @@ class MessageInputState extends State<MessageInput> {
     if (widget.disableEnterToSend != true) {
       if (HardwareKeyboard.instance
           .isLogicalKeyPressed(LogicalKeyboardKey.enter)) {
-        if (autoFillSelection != null && autoFillRange != null) {
-          applyAutoFill(autoFillResults![autoFillSelection!]);
-          return KeyEventResult.handled;
+        // Only the initial key-down acts; auto-repeat and key-up events are
+        // swallowed so a held or fast Enter does not send twice (#868).
+        switch (resolveEnterAction(
+          isInitialPress: event is KeyDownEvent,
+          shiftPressed: HardwareKeyboard.instance.isShiftPressed,
+          hasAutofillSelection:
+              autoFillSelection != null && autoFillRange != null,
+        )) {
+          case EnterAction.applyAutofill:
+            applyAutoFill(autoFillResults![autoFillSelection!]);
+            return KeyEventResult.handled;
+          case EnterAction.send:
+            sendMessage();
+            return KeyEventResult.handled;
+          case EnterAction.swallow:
+            return KeyEventResult.handled;
+          case EnterAction.ignore:
+            return KeyEventResult.ignored;
         }
-
-        if (HardwareKeyboard.instance.isShiftPressed) {
-          return KeyEventResult.ignored;
-        }
-
-        sendMessage();
-        return KeyEventResult.handled;
       }
     }
 
