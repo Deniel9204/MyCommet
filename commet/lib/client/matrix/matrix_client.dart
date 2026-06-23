@@ -531,7 +531,10 @@ class MatrixClient extends Client {
     await _matrixClient.waitForRoomInSync(id);
 
     var matrixRoom = _matrixClient.getRoomById(id)!;
-    if (args.enableE2EE!) {
+    if (args.enableE2EE! && !matrixRoom.encrypted) {
+      // Guard against double-enabling: some presets/creation paths already
+      // enable encryption, and enableEncryption() throws "Encryption is
+      // already enabled!" if called again (#864).
       await matrixRoom.enableEncryption();
     }
 
