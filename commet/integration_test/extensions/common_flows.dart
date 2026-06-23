@@ -14,8 +14,14 @@ import 'package:commet/generated/l10n.dart';
 import 'wait_for.dart';
 
 extension CommonFlows on WidgetTester {
-  String get homeserver =>
-      const String.fromEnvironment('HOMESERVER', defaultValue: "localhost");
+  String get homeserver {
+    const value =
+        String.fromEnvironment('HOMESERVER', defaultValue: "localhost");
+    // The Matrix SDK treats a bare host as https; the integration homeserver
+    // runs over http, so ensure an explicit scheme for the login field.
+    return value.startsWith("http") ? value : "http://$value";
+  }
+
   String get username =>
       const String.fromEnvironment('USER1_NAME', defaultValue: "alice");
   String get password => const String.fromEnvironment('USER1_PW',
