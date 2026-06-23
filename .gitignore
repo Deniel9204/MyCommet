@@ -18,3 +18,9 @@ commet/.livekit/
 commet/web/e2ee.worker.dart.js.map
 commet/web/e2ee.worker.dart.js.deps
 commet/web/e2ee.worker.dart.js
+
+# FVM local SDK cache/symlink (version pin lives in .fvmrc / commet/.fvmrc)
+/.fvm/
+
+# Serena MCP local tooling config
+/.serena/
