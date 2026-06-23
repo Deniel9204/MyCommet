@@ -5,6 +5,10 @@ git clone https://github.com/famedly/dart-vodozemac.git .vodozemac
 cd .vodozemac
 git checkout 0.5.0
 cargo install flutter_rust_bridge_codegen
+# The wasm build uses -Z build-std, which needs the rust-src component on the
+# nightly toolchain (build-web sets RUSTUP_TOOLCHAIN=nightly).
+rustup toolchain install nightly
+rustup component add rust-src --toolchain nightly
 flutter_rust_bridge_codegen build-web --dart-root dart --rust-root $(readlink -f rust) --release
 cd ..
 rm -f ./assets/vodozemac/vodozemac_bindings_dart*
