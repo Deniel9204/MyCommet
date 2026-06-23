@@ -1,4 +1,5 @@
 import 'package:commet/debug/log.dart';
+import 'package:commet/utils/backoff_delay.dart';
 
 Future<T?> exponentialBackoff<T>(Future<T> Function() callback,
     {Duration maxDelay = const Duration(seconds: 30),
@@ -13,15 +14,11 @@ Future<T?> exponentialBackoff<T>(Future<T> Function() callback,
       Log.d("Success!");
       return result;
     } catch (e) {
-      delay = delay * 2;
+      delay = nextBackoffDelay(delay, maxDelay);
 
       Log.d("Waiting ${delay.inMilliseconds}ms then retrying");
 
       await Future.delayed(delay);
-
-      if (delay.inMilliseconds > maxDelay.inMilliseconds) {
-        delay = maxDelay;
-      }
     }
   }
 
