@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:commet/client/matrix/matrix_client.dart';
 import 'package:commet/main.dart';
 import 'package:commet/ui/atoms/rich_text/spans/link.dart';
+import 'package:commet/utils/duration_format.dart';
 import 'package:commet/utils/time_format.dart';
 import 'package:flutter/material.dart';
 import 'emoji/emoji_matcher.dart';
@@ -190,16 +191,8 @@ class TextUtils {
     return intl.DateFormat().format(time.toLocal());
   }
 
-  static String formatDuration(Duration duration) {
-    if (duration.inSeconds < 60) {
-      return "${duration.inSeconds}s";
-    }
-
-    if (duration.inMinutes < 60) {
-      return "${duration.inMinutes.remainder(60)}:${(duration.inSeconds.remainder(60))}";
-    }
-    return "${duration.inHours}:${duration.inMinutes.remainder(60)}:${(duration.inSeconds.remainder(60))}";
-  }
+  static String formatDuration(Duration duration) =>
+      durationToShortString(duration);
 
   static String readableFileSize(num number, {bool base1024 = true}) {
     const List<String> affixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
