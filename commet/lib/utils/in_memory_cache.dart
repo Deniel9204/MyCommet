@@ -22,7 +22,16 @@ class InMemoryCache<T> {
   Map<String, (T, DateTime)> _cache = {};
 
   void put(String key, T value) {
+    // Re-inserting moves the key to the most-recent position so the size limit
+    // evicts the least-recently-written entry first.
+    _cache.remove(key);
     _cache[key] = (value, DateTime.now());
+
+    while (_cache.length > limit) {
+      final oldest = _cache.keys.first;
+      _controller.add(oldest);
+      _cache.remove(oldest);
+    }
   }
 
   T? get(String key) {
