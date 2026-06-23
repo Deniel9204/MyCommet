@@ -1,3 +1,7 @@
 [workspace]
 resolver = "3"
 members = ["rust/rust"]
+# scripts/prepare-web.sh clones vodozemac/livekit into the tree at build time;
+# their nested crates must be excluded or cargo refuses to read this workspace's
+# (or their own) manifest from inside those dirs.
+exclude = ["commet/.vodozemac", "commet/.livekit"]
