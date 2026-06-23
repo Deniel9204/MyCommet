@@ -113,11 +113,20 @@ class MatrixUserPresenceComponent
       {String? message, bool clearMessage = false}) async {
     final self = client.self!.identifier;
 
-    final current = await client.matrixClient.getPresence(self);
+    // Some homeservers don't expose presence; getPresence can throw a
+    // null-check error in the SDK (#924). Fall back to no existing message
+    // rather than crashing when the user changes their status.
+    String? currentStatusMsg;
+    try {
+      final current = await client.matrixClient.getPresence(self);
+      currentStatusMsg = current.statusMsg;
+    } catch (_) {
+      currentStatusMsg = null;
+    }
 
     await client.matrixClient.setPresence(
         self,
-        statusMsg: clearMessage ? null : message ?? current.statusMsg,
+        statusMsg: clearMessage ? null : message ?? currentStatusMsg,
         switch (status) {
           UserPresenceStatus.offline => PresenceType.offline,
           UserPresenceStatus.unknown => PresenceType.offline,
