@@ -70,6 +70,15 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       desc:
           "Description for enabling using visibility of room state events in the timeline");
 
+  String get labelRelativeTimestamps => Intl.message("Relative date dividers",
+      name: "labelRelativeTimestamps",
+      desc: "Label for showing Today/Yesterday on timeline date dividers");
+
+  String get labelRelativeTimestampsDescription => Intl.message(
+      "Show \"Today\" and \"Yesterday\" on the date dividers between messages",
+      name: "labelRelativeTimestampsDescription",
+      desc: "Description for the relative date dividers setting");
+
   @override
   void initState() {
     super.initState();
@@ -120,9 +129,19 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
         Panel(
           header: "Time & Date",
           mode: TileType.surfaceContainerLow,
-          child: const Padding(
-            padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
-            child: TimeFormatSelector(),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+            child: Column(
+              children: [
+                const TimeFormatSelector(),
+                const Seperator(),
+                BooleanPreferenceToggle(
+                  preference: preferences.relativeTimestamps,
+                  title: labelRelativeTimestamps,
+                  description: labelRelativeTimestampsDescription,
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(

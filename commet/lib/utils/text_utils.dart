@@ -149,6 +149,21 @@ class TextUtils {
   }
 
   static String timestampToLocalizedTime(DateTime time, BuildContext context) {
+    if (preferences.relativeTimestamps.value) {
+      switch (classifyRelativeDay(time, DateTime.now())) {
+        case RelativeDay.today:
+          return intl.Intl.message("Today",
+              name: "labelToday",
+              desc: "Relative day divider label for messages sent today");
+        case RelativeDay.yesterday:
+          return intl.Intl.message("Yesterday",
+              name: "labelYesterday",
+              desc: "Relative day divider label for messages sent yesterday");
+        case RelativeDay.older:
+          break;
+      }
+    }
+
     var difference = DateTime.now().difference(time);
 
     if (difference.inDays == 0) {

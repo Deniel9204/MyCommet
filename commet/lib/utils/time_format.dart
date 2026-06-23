@@ -41,3 +41,20 @@ String formatTimeOfDay(DateTime time, {required bool use24Hour, String? locale})
   final format = use24Hour ? DateFormat.Hm(locale) : DateFormat.jm(locale);
   return format.format(time);
 }
+
+/// Where [time] falls relative to [now], compared by calendar day (not by a
+/// 24-hour difference): a message at 23:00 and a "now" at 01:00 the next
+/// morning are [RelativeDay.yesterday], not the same day.
+enum RelativeDay { today, yesterday, older }
+
+/// Classifies [time] against [now] by calendar day. Pure so it can be unit
+/// tested; the caller supplies localized "Today"/"Yesterday" labels.
+RelativeDay classifyRelativeDay(DateTime time, DateTime now) {
+  final t = DateTime(time.year, time.month, time.day);
+  final n = DateTime(now.year, now.month, now.day);
+  final days = n.difference(t).inDays;
+
+  if (days <= 0) return RelativeDay.today;
+  if (days == 1) return RelativeDay.yesterday;
+  return RelativeDay.older;
+}

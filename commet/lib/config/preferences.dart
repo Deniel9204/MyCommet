@@ -410,6 +410,10 @@ class Preferences {
   StringPreference timeFormat =
       StringPreference("time_format", defaultValue: "system");
 
+  /// When true, day dividers show "Today" / "Yesterday" instead of a date/time.
+  BoolPreference relativeTimestamps =
+      BoolPreference("relative_timestamps", defaultValue: false);
+
   BoolPreference silenceNotifications = BoolPreference(
       "silence_notifications_when_other_device_active",
       defaultValue: true);

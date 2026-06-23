@@ -41,6 +41,45 @@ void main() {
     });
   });
 
+  group('classifyRelativeDay', () {
+    final now = DateTime(2026, 6, 23, 10, 0);
+
+    test('same calendar day is today', () {
+      expect(classifyRelativeDay(DateTime(2026, 6, 23, 0, 1), now),
+          RelativeDay.today);
+      expect(classifyRelativeDay(DateTime(2026, 6, 23, 23, 59), now),
+          RelativeDay.today);
+    });
+
+    test('previous calendar day is yesterday even if < 24h apart', () {
+      // 23:00 yesterday vs 10:00 today is 11h, but a different calendar day.
+      expect(classifyRelativeDay(DateTime(2026, 6, 22, 23, 0), now),
+          RelativeDay.yesterday);
+    });
+
+    test('two days ago is older', () {
+      expect(classifyRelativeDay(DateTime(2026, 6, 21, 23, 59), now),
+          RelativeDay.older);
+    });
+
+    test('handles month boundary', () {
+      final july1 = DateTime(2026, 7, 1, 9, 0);
+      expect(classifyRelativeDay(DateTime(2026, 6, 30, 12, 0), july1),
+          RelativeDay.yesterday);
+    });
+
+    test('handles year boundary', () {
+      final jan1 = DateTime(2026, 1, 1, 0, 30);
+      expect(classifyRelativeDay(DateTime(2025, 12, 31, 23, 30), jan1),
+          RelativeDay.yesterday);
+    });
+
+    test('future timestamps are treated as today', () {
+      expect(classifyRelativeDay(DateTime(2026, 6, 23, 18, 0), now),
+          RelativeDay.today);
+    });
+  });
+
   group('TimeFormatPreference', () {
     test('round-trips every storage value', () {
       for (final p in TimeFormatPreference.values) {
