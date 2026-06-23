@@ -124,6 +124,9 @@ class MatrixBackgroundRoom implements Room {
   int get displayNotificationCount => throw UnimplementedError();
 
   @override
+  bool get hasUnreadMessages => throw UnimplementedError();
+
+  @override
   Future<void> enableE2EE() {
     throw UnimplementedError();
   }
