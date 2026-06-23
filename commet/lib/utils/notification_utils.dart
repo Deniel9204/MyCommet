@@ -14,7 +14,7 @@ class NotificationUtils {
     }
 
     for (var dm in clientManager!.directMessages.highlightedRoomsList) {
-      highlightedNotificationCount += dm.displayNotificationCount;
+      highlightedNotificationCount += dm.displayHighlightedNotificationCount;
       notificationCount += dm.displayNotificationCount;
     }
 
