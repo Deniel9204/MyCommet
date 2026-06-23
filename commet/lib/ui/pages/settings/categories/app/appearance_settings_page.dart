@@ -4,6 +4,7 @@ import 'package:commet/ui/pages/settings/categories/app/double_preference_slider
 import 'package:commet/ui/pages/settings/categories/app/theme_settings/theme_settings_widget.dart';
 import 'package:commet/utils/common_strings.dart';
 import 'package:commet/utils/scaled_app.dart';
+import 'package:commet/utils/time_format.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:intl/intl.dart';
@@ -111,6 +112,17 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 description: "Multiply the size of text",
               )
             ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Panel(
+          header: "Time & Date",
+          mode: TileType.surfaceContainerLow,
+          child: const Padding(
+            padding: EdgeInsets.fromLTRB(8, 4, 8, 4),
+            child: TimeFormatSelector(),
           ),
         ),
         const SizedBox(
@@ -239,6 +251,68 @@ class _UIScaleSelectorState extends State<UIScaleSelector> {
           )
         ],
       ),
+    );
+  }
+}
+
+class TimeFormatSelector extends StatefulWidget {
+  const TimeFormatSelector({super.key});
+
+  @override
+  State<TimeFormatSelector> createState() => _TimeFormatSelectorState();
+}
+
+class _TimeFormatSelectorState extends State<TimeFormatSelector> {
+  late TimeFormatPreference value;
+
+  String get labelTimeFormat => Intl.message("Time format",
+      name: "labelTimeFormat",
+      desc: "Label for the 12h/24h timestamp format setting");
+
+  @override
+  void initState() {
+    value = TimeFormatPreference.fromStorage(preferences.timeFormat.value);
+    super.initState();
+  }
+
+  String _optionLabel(TimeFormatPreference p) {
+    switch (p) {
+      case TimeFormatPreference.system:
+        return Intl.message("System default",
+            name: "labelTimeFormatSystem",
+            desc: "Time format option that follows the operating system");
+      case TimeFormatPreference.twelveHour:
+        return Intl.message("12-hour (2:30 PM)",
+            name: "labelTimeFormat12",
+            desc: "Time format option for 12-hour clock");
+      case TimeFormatPreference.twentyFourHour:
+        return Intl.message("24-hour (14:30)",
+            name: "labelTimeFormat24",
+            desc: "Time format option for 24-hour clock");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(child: tiamat.Text(labelTimeFormat)),
+        m.DropdownButton<TimeFormatPreference>(
+          value: value,
+          items: TimeFormatPreference.values
+              .map((p) => m.DropdownMenuItem(
+                    value: p,
+                    child: tiamat.Text(_optionLabel(p)),
+                  ))
+              .toList(),
+          onChanged: (p) {
+            if (p == null) return;
+            setState(() => value = p);
+            preferences.timeFormat.set(p.storageValue);
+          },
+        ),
+      ],
     );
   }
 }

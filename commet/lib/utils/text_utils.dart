@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:commet/client/matrix/matrix_client.dart';
 import 'package:commet/main.dart';
 import 'package:commet/ui/atoms/rich_text/spans/link.dart';
+import 'package:commet/utils/time_format.dart';
 import 'package:flutter/material.dart';
 import 'emoji/emoji_matcher.dart';
 import 'package:intl/intl.dart' as intl;
@@ -151,8 +152,14 @@ class TextUtils {
     var difference = DateTime.now().difference(time);
 
     if (difference.inDays == 0) {
-      return MaterialLocalizations.of(context)
-          .formatTimeOfDay(TimeOfDay.fromDateTime(time));
+      final use24Hour = switch (TimeFormatPreference.fromStorage(
+          preferences.timeFormat.value)) {
+        TimeFormatPreference.twelveHour => false,
+        TimeFormatPreference.twentyFourHour => true,
+        TimeFormatPreference.system =>
+          MediaQuery.of(context).alwaysUse24HourFormat,
+      };
+      return formatTimeOfDay(time, use24Hour: use24Hour);
     }
 
     if (difference.inDays < 365) {

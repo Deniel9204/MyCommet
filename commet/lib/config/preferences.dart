@@ -404,6 +404,12 @@ class Preferences {
   BoolPreference askBeforeDeletingMessageEnabled =
       BoolPreference("ask_before_deleting_message_enabled", defaultValue: true);
 
+  /// Controls 12h/24h timestamp display. One of "system", "12", "24";
+  /// parsed via [TimeFormatPreference.fromStorage]. "system" follows the OS
+  /// setting (MediaQuery.alwaysUse24HourFormat).
+  StringPreference timeFormat =
+      StringPreference("time_format", defaultValue: "system");
+
   BoolPreference silenceNotifications = BoolPreference(
       "silence_notifications_when_other_device_active",
       defaultValue: true);
