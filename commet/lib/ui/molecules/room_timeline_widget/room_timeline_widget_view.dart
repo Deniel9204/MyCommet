@@ -68,6 +68,7 @@ class RoomTimelineWidgetViewState extends State<RoomTimelineWidgetView> {
 
   String? highlightedEventId;
   TimelineViewEntryState? highlightedEventState;
+  Timer? highlightClearTimer;
   GlobalKey? highlightedEventOffstageKey;
   int? highlightedEventOffstageIndex;
   List<StreamSubscription>? subscriptions;
@@ -164,11 +165,22 @@ class RoomTimelineWidgetViewState extends State<RoomTimelineWidgetView> {
 
   @override
   void dispose() {
+    highlightClearTimer?.cancel();
     for (var element in subscriptions!) {
       element.cancel();
     }
 
     super.dispose();
+  }
+
+  /// Removes the jump-to-event highlight and cancels any pending auto-clear.
+  void clearHighlight() {
+    highlightClearTimer?.cancel();
+    highlightClearTimer = null;
+    if (highlightedEventState?.mounted == true) {
+      highlightedEventState!.setHighlighted(false);
+    }
+    highlightedEventState = null;
   }
 
   void onEventAdded(int index, {bool cascade = true}) {
@@ -598,9 +610,8 @@ class RoomTimelineWidgetViewState extends State<RoomTimelineWidgetView> {
   }
 
   void jumpToEvent(String eventId, {bool highlight = true}) async {
-    if (highlight && highlightedEventState?.mounted == true) {
-      highlightedEventState!.setHighlighted(false);
-      highlightedEventState = null;
+    if (highlight) {
+      clearHighlight();
     }
 
     int index = timeline.events.indexWhere((event) => event.eventId == eventId);
@@ -630,6 +641,11 @@ class RoomTimelineWidgetViewState extends State<RoomTimelineWidgetView> {
       if (highlight && state is TimelineViewEntryState) {
         state.setHighlighted(true);
         highlightedEventState = state;
+        // Auto-clear the highlight so a jumped-to message doesn't stay
+        // selected until the next jump or leaving the room (#52).
+        highlightClearTimer?.cancel();
+        highlightClearTimer =
+            Timer(const Duration(seconds: 5), clearHighlight);
       }
 
       var boundsSize = stackKey.globalPaintBounds?.height;
