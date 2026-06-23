@@ -1,4 +1,5 @@
 import 'package:commet/client/components/account_switch_prefix/account_switch_prefix.dart';
+import 'package:commet/utils/draft_store.dart';
 import 'package:commet/client/components/push_notification/notification_manager.dart';
 import 'package:commet/client/room.dart';
 import 'package:commet/client/timeline_events/timeline_event.dart';
@@ -120,6 +121,7 @@ class ChatView extends StatelessWidget {
           state.sendMessage(message, overrideClient: overrideClient);
           return MessageInputSendResult.success;
         },
+        initialText: messageDrafts.getDraft(state.draftKey),
         onTextUpdated: state.onInputTextUpdated,
         addAttachment: state.addAttachment,
         removeAttachment: state.removeAttachment,
