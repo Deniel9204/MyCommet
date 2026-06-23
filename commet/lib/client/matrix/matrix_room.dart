@@ -106,6 +106,9 @@ class MatrixRoom extends Room {
   @override
   int get notificationCount => _matrixRoom.notificationCount;
 
+  @override
+  bool get hasUnreadMessages => _matrixRoom.isUnread;
+
   late DateTime _lastStateEventTimestamp;
   @override
   DateTime get lastEventTimestamp => lastEvent == null

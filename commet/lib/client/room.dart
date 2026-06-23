@@ -152,6 +152,11 @@ abstract class Room {
   int get displayHighlightedNotificationCount =>
       pushRule != PushRule.dontNotify ? highlightedNotificationCount : 0;
 
+  /// Whether the room has unread content, independent of notification settings.
+  /// Used to show a subtle unread indicator for rooms that are muted or
+  /// explicitly marked unread and therefore have no notification badge.
+  bool get hasUnreadMessages => false;
+
   RoomVisibility get visibility;
 
   /// Send a message in this room
