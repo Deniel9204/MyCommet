@@ -6,6 +6,7 @@ import 'package:commet/client/matrix/matrix_timeline.dart';
 import 'package:commet/client/timeline_events/timeline_event.dart';
 import 'package:commet/ui/molecules/timeline_events/timeline_view_entry.dart';
 import 'package:commet/utils/mime.dart';
+import 'package:commet/utils/search_query.dart';
 // ignore: implementation_imports
 import 'package:matrix/src/event.dart';
 
@@ -19,54 +20,14 @@ class MatrixEventSearchSession extends EventSearchSession {
   @override
   bool currentlySearching = false;
 
-  bool _requireUrl = false;
-  bool _requireImage = false;
-  bool _requireVideo = false;
-  bool _requireAttachment = false;
-  String? _requiredType;
-  String? _requiredSender;
-
-  static const String hasLinkString = 'has:link';
-  static const String hasImageString = 'has:image';
-  static const String hasVideoString = 'has:video';
-  static const String hasFileString = 'has:file';
-
-  List<String>? _words;
+  SearchQuery? _query;
 
   @override
   Stream<List<TimelineEvent<Client>>> startSearch(String searchTerm) async* {
     currentSearchTerm = searchTerm.toLowerCase();
 
     currentlySearching = true;
-    _words = currentSearchTerm!.split(' ');
-
-    var typeMatch = _words!.where((w) => w.startsWith("type:")).firstOrNull;
-
-    if (typeMatch != null) {
-      _requiredType = typeMatch.split('type:').last;
-    }
-
-    var userMatch = _words!.where((w) => w.startsWith("from:")).firstOrNull;
-    if (userMatch != null) {
-      _requiredSender = userMatch.split('from:').last;
-    }
-
-    if (_words!.contains(hasLinkString)) _requireUrl = true;
-    if (_words!.contains(hasImageString)) _requireImage = true;
-    if (_words!.contains(hasVideoString)) _requireVideo = true;
-    if (_words!.contains(hasFileString)) _requireAttachment = true;
-
-    _words = _words!
-        .where((w) =>
-            [
-              typeMatch,
-              hasLinkString,
-              hasImageString,
-              hasVideoString,
-              hasFileString
-            ].contains(w) ==
-            false)
-        .toList();
+    _query = SearchQuery.parse(searchTerm);
 
     var search = timeline.matrixTimeline!
         .startSearch(searchTerm: searchTerm, searchFunc: searchFunc);
@@ -100,52 +61,15 @@ class MatrixEventSearchSession extends EventSearchSession {
   }
 
   bool searchFunc(Event event) {
-    final numMatchingWords = _words!
-        .where((w) => event.plaintextBody.toLowerCase().contains(w))
-        .length;
-
-    if (_requireAttachment) {
-      if (event.hasAttachment == false) {
-        return false;
-      }
-    }
-
-    if (_requireImage) {
-      if (!Mime.imageTypes.contains(event.attachmentMimetype)) {
-        return false;
-      }
-    }
-
-    if (_requireVideo) {
-      if (!Mime.videoTypes.contains(event.attachmentMimetype)) {
-        return false;
-      }
-    }
-
-    if (_requireUrl) {
-      if (!(event.plaintextBody.contains("https://") ||
-          event.plaintextBody.contains("http://"))) {
-        return false;
-      }
-    }
-
-    if (_requiredType != null) {
-      if (event.type != _requiredType && event.messageType != _requiredType) {
-        return false;
-      }
-    }
-
-    if (_requiredSender != null) {
-      if (event.senderId != _requiredSender) {
-        return false;
-      }
-    }
-
-    if (numMatchingWords < (_words!.length.toDouble() / 2.0)) {
-      return false;
-    }
-
-    return true;
+    return _query!.matches(
+      plaintextBody: event.plaintextBody,
+      type: event.type,
+      messageType: event.messageType,
+      senderId: event.senderId,
+      hasAttachment: event.hasAttachment,
+      isImageAttachment: Mime.imageTypes.contains(event.attachmentMimetype),
+      isVideoAttachment: Mime.videoTypes.contains(event.attachmentMimetype),
+    );
   }
 }
 
