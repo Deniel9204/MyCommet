@@ -83,8 +83,10 @@ class _SpaceHeaderState extends State<SpaceHeader> {
                   child: Align(
                     alignment: Alignment.bottomLeft,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(8, 2, 0, 2),
+                      padding: const EdgeInsets.fromLTRB(8, 2, 8, 2),
                       child: Text(widget.space.displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style:
                               Theme.of(context).textTheme.titleMedium!.copyWith(
                                   color: colorScheme.onPrimary,
