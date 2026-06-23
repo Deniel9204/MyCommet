@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:commet/client/attachment.dart';
+import 'package:commet/utils/draft_store.dart';
 import 'package:commet/client/client.dart';
 import 'package:commet/client/components/account_switch_prefix/account_switch_prefix.dart';
 import 'package:commet/client/components/command/command_component.dart';
@@ -46,6 +47,12 @@ enum EventInteractionType {
 
 class ChatState extends State<Chat> {
   Room get room => widget.room;
+
+  /// Per-room (and per-thread) key under which the unsent composer draft is
+  /// stored, so switching rooms doesn't lose in-progress text.
+  String get draftKey => widget.threadId != null
+      ? "${room.identifier}/thread/${widget.threadId}"
+      : room.identifier;
   Timeline? _timeline;
 
   Timeline? get timeline => _timeline;
@@ -260,6 +267,7 @@ class ChatState extends State<Chat> {
     setInteractingEvent(null);
     clearAttachments();
     setMessageInputText.add("");
+    messageDrafts.clearDraft(draftKey);
   }
 
   Future<void> doCommand(
@@ -352,6 +360,8 @@ class ChatState extends State<Chat> {
   }
 
   void onInputTextUpdated(String currentText) {
+    messageDrafts.setDraft(draftKey, currentText);
+
     if (isThread) {
       return;
     }
