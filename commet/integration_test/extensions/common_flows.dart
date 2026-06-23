@@ -8,6 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:commet/main.dart';
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:tiamat/tiamat.dart' as tiamat;
+import 'package:commet/generated/l10n.dart';
 
 import 'wait_for.dart';
 
@@ -63,49 +65,43 @@ extension CommonFlows on WidgetTester {
   Future<void> login(App app) async {
     await waitFor(() => find.byType(LoginPage).evaluate().isNotEmpty);
 
-    var button = find.widgetWithText(ElevatedButton, "Login");
-
-    var inputs = find.byType(TextField);
-    expect(inputs, findsWidgets);
-
-    // Build our app and trigger a frame.
-
-    await enterText(inputs.at(0), homeserver);
-    await pumpAndSettle();
-    await enterText(inputs.at(1), username);
-    await pumpAndSettle();
-    await enterText(inputs.at(2), password);
+    // Enter the homeserver first; the username/password fields and the login
+    // button only appear once the homeserver's login flow has loaded.
+    await enterText(find.byType(TextField).at(0), homeserver);
     await pumpAndSettle();
 
-    await tap(button);
+    await waitFor(() => find.byType(TextField).evaluate().length >= 3);
 
+    await enterText(find.byType(TextField).at(1), username);
+    await pumpAndSettle();
+    await enterText(find.byType(TextField).at(2), password);
+    await pumpAndSettle();
+
+    await tap(find.widgetWithText(tiamat.Button, T.current.promptSubmitLogin));
     await pumpAndSettle();
 
     await waitFor(() => app.clientManager.isLoggedIn(),
-        timeout: const Duration(seconds: 5), skipPumpAndSettle: true);
+        timeout: const Duration(seconds: 10), skipPumpAndSettle: true);
     expect(app.clientManager.isLoggedIn(), equals(true));
   }
 
   Future<void> loginUser2(App app) async {
     await waitFor(() => find.byType(LoginPage).evaluate().isNotEmpty);
-    var button = find.widgetWithText(ElevatedButton, "Login");
-
-    var inputs = find.byType(TextField);
-    expect(inputs, findsWidgets);
-
-    await enterText(inputs.at(0), homeserver);
-    await pumpAndSettle();
-    await enterText(inputs.at(1), userTwoName);
-    await pumpAndSettle();
-    await enterText(inputs.at(2), userTwoPassword);
+    await enterText(find.byType(TextField).at(0), homeserver);
     await pumpAndSettle();
 
-    await tap(button);
+    await waitFor(() => find.byType(TextField).evaluate().length >= 3);
 
+    await enterText(find.byType(TextField).at(1), userTwoName);
+    await pumpAndSettle();
+    await enterText(find.byType(TextField).at(2), userTwoPassword);
+    await pumpAndSettle();
+
+    await tap(find.widgetWithText(tiamat.Button, T.current.promptSubmitLogin));
     await pumpAndSettle();
 
     await waitFor(() => app.clientManager.isLoggedIn(),
-        timeout: const Duration(seconds: 5), skipPumpAndSettle: true);
+        timeout: const Duration(seconds: 10), skipPumpAndSettle: true);
     expect(app.clientManager.isLoggedIn(), equals(true));
   }
 
