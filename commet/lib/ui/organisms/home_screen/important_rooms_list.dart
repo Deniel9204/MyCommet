@@ -30,6 +30,9 @@ class ImportantRoomsList extends StatelessWidget {
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             list: state.favoriteRooms,
+            sortFunction: (p0, p1) {
+              return p1.lastEventTimestamp.compareTo(p0.lastEventTimestamp);
+            },
             builder: (context, {required child, required list}) {
               if (list.isNotEmpty) {
                 return Column(
