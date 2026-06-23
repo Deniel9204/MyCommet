@@ -4,6 +4,7 @@ import 'package:commet/client/matrix/matrix_client.dart';
 import 'package:commet/main.dart';
 import 'package:commet/ui/atoms/rich_text/spans/link.dart';
 import 'package:commet/utils/duration_format.dart';
+import 'package:commet/utils/file_size_format.dart';
 import 'package:commet/utils/time_format.dart';
 import 'package:flutter/material.dart';
 import 'emoji/emoji_matcher.dart';
@@ -194,35 +195,8 @@ class TextUtils {
   static String formatDuration(Duration duration) =>
       durationToShortString(duration);
 
-  static String readableFileSize(num number, {bool base1024 = true}) {
-    const List<String> affixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-    const useBase1024 = true;
-    const int round = 2;
-
-    // ignore: dead_code
-    num divider = useBase1024 ? 1024 : 1000;
-
-    num size = number;
-    num runningDivider = divider;
-    num runningPreviousDivider = 0;
-    int affix = 0;
-
-    while (size >= runningDivider && affix < affixes.length - 1) {
-      runningPreviousDivider = runningDivider;
-      runningDivider *= divider;
-      affix++;
-    }
-
-    String result =
-        (runningPreviousDivider == 0 ? size : size / runningPreviousDivider)
-            .toStringAsFixed(round);
-
-    //Check if the result ends with .00000 (depending on how many decimals) and remove it if found.
-    if (result.endsWith("0" * round))
-      result = result.substring(0, result.length - round - 1);
-
-    return "$result ${affixes[affix]}";
-  }
+  static String readableFileSize(num number, {bool base1024 = true}) =>
+      formatFileSize(number, base1024: base1024);
 
   static String redactSensitiveInfo(String text) {
     if (clientManager != null) {
