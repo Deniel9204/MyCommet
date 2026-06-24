@@ -2,9 +2,11 @@ import 'package:commet/client/components/emoticon/emoticon.dart';
 import 'package:commet/client/components/url_preview/url_preview_component.dart';
 import 'package:commet/config/build_config.dart';
 import 'package:commet/diagnostic/benchmark_values.dart';
+import 'package:commet/main.dart';
 import 'package:commet/ui/atoms/emoji_reaction.dart';
 import 'package:commet/ui/molecules/url_preview_widget.dart';
 import 'package:commet/utils/links/link_utils.dart';
+import 'package:commet/utils/time_format.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tiamat/tiamat.dart';
@@ -224,18 +226,21 @@ class _MessageState extends State<Message> {
   }
 
   Widget timeStamp() {
+    final use24 = resolveUse24Hour(
+        TimeFormatPreference.fromStorage(preferences.timeFormat.value),
+        MediaQuery.of(context).alwaysUse24HourFormat);
     return Padding(
         padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
         child: SizedBox(
             child: tiamat.Text.labelLow(widget.showDetailed
-                ? MediaQuery.of(context).alwaysUse24HourFormat
+                ? use24
                     ? intl.DateFormat.yMMMMd()
                         .add_Hms()
                         .format(widget.sentTimeStamp.toLocal())
                     : intl.DateFormat.yMMMMd()
                         .add_jms()
                         .format(widget.sentTimeStamp.toLocal())
-                : MediaQuery.of(context).alwaysUse24HourFormat
+                : use24
                     ? intl.DateFormat.Hm()
                         .format(widget.sentTimeStamp.toLocal())
                     : intl.DateFormat.jm()

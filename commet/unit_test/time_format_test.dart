@@ -125,6 +125,36 @@ void main() {
     });
   });
 
+  group('resolveUse24Hour', () {
+    test('explicit 24-hour overrides system default', () {
+      expect(resolveUse24Hour(TimeFormatPreference.twentyFourHour, false), isTrue);
+    });
+
+    test('explicit 12-hour overrides system default', () {
+      expect(resolveUse24Hour(TimeFormatPreference.twelveHour, true), isFalse);
+    });
+
+    test('system defers to the platform flag', () {
+      expect(resolveUse24Hour(TimeFormatPreference.system, true), isTrue);
+      expect(resolveUse24Hour(TimeFormatPreference.system, false), isFalse);
+    });
+
+    test('explicit prefs are independent of the system flag', () {
+      expect(resolveUse24Hour(TimeFormatPreference.twelveHour, true),
+          resolveUse24Hour(TimeFormatPreference.twelveHour, false));
+      expect(resolveUse24Hour(TimeFormatPreference.twentyFourHour, true),
+          resolveUse24Hour(TimeFormatPreference.twentyFourHour, false));
+    });
+
+    test('feeds formatTimeOfDay correctly', () {
+      final t = DateTime(2026, 6, 23, 14, 30);
+      final use24 = resolveUse24Hour(TimeFormatPreference.twentyFourHour, false);
+      expect(fmt(t, use24Hour: use24), '14:30');
+      final use12 = resolveUse24Hour(TimeFormatPreference.twelveHour, true);
+      expect(fmt(t, use24Hour: use12), '2:30 PM');
+    });
+  });
+
   group('TimeFormatPreference', () {
     test('round-trips every storage value', () {
       for (final p in TimeFormatPreference.values) {

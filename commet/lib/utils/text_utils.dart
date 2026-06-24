@@ -169,13 +169,9 @@ class TextUtils {
     var difference = DateTime.now().difference(time);
 
     if (difference.inDays == 0) {
-      final use24Hour = switch (
-          TimeFormatPreference.fromStorage(preferences.timeFormat.value)) {
-        TimeFormatPreference.twelveHour => false,
-        TimeFormatPreference.twentyFourHour => true,
-        TimeFormatPreference.system =>
-          MediaQuery.of(context).alwaysUse24HourFormat,
-      };
+      final use24Hour = resolveUse24Hour(
+          TimeFormatPreference.fromStorage(preferences.timeFormat.value),
+          MediaQuery.of(context).alwaysUse24HourFormat);
       return formatTimeOfDay(time, use24Hour: use24Hour);
     }
 
