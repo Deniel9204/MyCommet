@@ -27,6 +27,7 @@ import 'package:commet/utils/autofill_utils.dart';
 import 'package:commet/utils/debounce.dart';
 import 'package:commet/utils/enter_key_action.dart';
 import 'package:commet/utils/markdown_wrap.dart';
+import 'package:commet/utils/formatting_shortcut.dart';
 import 'package:commet/utils/event_bus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
@@ -548,6 +549,20 @@ class MessageInputState extends State<MessageInput> {
 
   KeyEventResult onKey(FocusNode node, KeyEvent event) {
     if (BuildConfig.MOBILE) return KeyEventResult.ignored;
+
+    // Markdown formatting shortcuts (Ctrl/Cmd + B / I / E) wrap the selection.
+    if (event is KeyDownEvent &&
+        (HardwareKeyboard.instance.isControlPressed ||
+            HardwareKeyboard.instance.isMetaPressed)) {
+      final selection = controller.selection;
+      if (selection.isValid && !selection.isCollapsed) {
+        final marker = markerForFormattingShortcut(event.logicalKey.keyLabel);
+        if (marker != null) {
+          applyMarkdownWrap(marker);
+          return KeyEventResult.handled;
+        }
+      }
+    }
 
     if (!preferences.disableTextCursorManagement.value) {
       if (HardwareKeyboard.instance
