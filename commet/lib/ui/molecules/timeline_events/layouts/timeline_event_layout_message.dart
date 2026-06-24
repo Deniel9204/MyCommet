@@ -1,4 +1,5 @@
 import 'package:commet/diagnostic/benchmark_values.dart';
+import 'package:commet/utils/message_semantic_label.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tiamat/tiamat.dart' as tiamat;
@@ -24,6 +25,7 @@ class TimelineEventLayoutMessage extends StatelessWidget {
       this.avatarSize = 32,
       this.avatarBuilder,
       this.showSender = true,
+      this.plainTextBody,
       this.onDoubleTapMessage});
   final String senderName;
   final Color senderColor;
@@ -44,11 +46,26 @@ class TimelineEventLayoutMessage extends StatelessWidget {
   final Widget Function(Widget child)? avatarBuilder;
   final Function()? onDoubleTapMessage;
 
+  /// Plain-text body used to build the screen-reader label for this message.
+  final String? plainTextBody;
+
   final double avatarSize;
 
   String get messageEditedMarker => Intl.message("(Edited)",
       name: "messageEditedMarker",
       desc: "Short text to mark that a message has been edited");
+
+  String get messageSemanticHasAttachment => Intl.message("has attachment",
+      name: "messageSemanticHasAttachment",
+      desc: "Screen-reader label noting a message has an attachment");
+
+  String get messageSemanticHasSticker => Intl.message("sticker",
+      name: "messageSemanticHasSticker",
+      desc: "Screen-reader label noting a message is a sticker");
+
+  String get messageSemanticHasReactions => Intl.message("has reactions",
+      name: "messageSemanticHasReactions",
+      desc: "Screen-reader label noting a message has reactions");
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +158,27 @@ class TimelineEventLayoutMessage extends StatelessWidget {
         ),
       );
 
-    return result;
+    // Announce each message as one coherent unit to screen readers instead of
+    // a silent/jumbled pile of nested layout widgets. Interactive descendants
+    // (reactions, links, avatar) are reconciled in a follow-up; for now the
+    // message reads as a single labelled node.
+    return Semantics(
+      container: true,
+      label: buildMessageSemanticLabel(
+        senderName: senderName,
+        timestamp: timestamp,
+        body: plainTextBody,
+        hasAttachment: attachments != null,
+        hasSticker: sticker != null,
+        hasReactions: reactions != null,
+        isEdited: edited,
+        attachmentLabel: messageSemanticHasAttachment,
+        stickerLabel: messageSemanticHasSticker,
+        reactionsLabel: messageSemanticHasReactions,
+        editedLabel: messageEditedMarker,
+      ),
+      child: ExcludeSemantics(child: result),
+    );
   }
 
   Widget name() {
