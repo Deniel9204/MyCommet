@@ -44,5 +44,29 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       expect(removed, contains('a'));
     });
+
+    test('remove() drops a key', () {
+      final c = InMemoryCache<int>(limit: 5);
+      c.put('a', 1);
+      c.remove('a');
+      expect(c.get('a'), isNull);
+    });
+
+    test('remove() of a missing key is a no-op', () {
+      final c = InMemoryCache<int>(limit: 5);
+      c.put('a', 1);
+      c.remove('missing');
+      expect(c.get('a'), 1);
+    });
+
+    test('remove() does not emit on onRemove', () async {
+      final c = InMemoryCache<int>(limit: 5);
+      final removed = <String>[];
+      c.onRemove.listen(removed.add);
+      c.put('a', 1);
+      c.remove('a');
+      await Future<void>.delayed(Duration.zero);
+      expect(removed, isEmpty);
+    });
   });
 }
