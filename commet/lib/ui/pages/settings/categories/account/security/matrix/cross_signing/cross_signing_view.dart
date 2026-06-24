@@ -22,6 +22,8 @@ class MatrixCrossSigningView extends StatefulWidget {
       this.wipeSsss,
       this.wipeExistingBackup,
       this.openExistingSsss,
+      this.unlockSsss,
+      this.ignoreBadSsss,
       this.wipeCrossSigning});
   final BootstrapState state;
 
@@ -32,6 +34,14 @@ class MatrixCrossSigningView extends StatefulWidget {
   final Function(bool)? wipeSsss;
   final Function(bool)? wipeExistingBackup;
   final Function(String)? openExistingSsss;
+
+  /// Unlocks the existing secure storage with the given recovery key /
+  /// passphrase so its secrets can be migrated.
+  final Function(String)? unlockSsss;
+
+  /// Proceeds despite unreadable secure-storage secrets (true) or aborts
+  /// (false).
+  final Function(bool)? ignoreBadSsss;
   final Function(bool)? wipeCrossSigning;
   final String? recoveryKey;
   @override
@@ -248,13 +258,9 @@ class _MatrixCrossSigningViewState extends State<MatrixCrossSigningView> {
       case BootstrapState.askUseExistingSsss:
         return askUseExistingSsss();
       case BootstrapState.askUnlockSsss:
-        // ignore: todo
-        // TODO: Handle this case.
-        break;
+        return unlockSsssWidget();
       case BootstrapState.askBadSsss:
-        // ignore: todo
-        // TODO: Handle this case.
-        break;
+        return askBadSsss();
       case BootstrapState.askNewSsss:
         return askNewSsss();
       case BootstrapState.openExistingSsss:
@@ -272,7 +278,6 @@ class _MatrixCrossSigningViewState extends State<MatrixCrossSigningView> {
       case BootstrapState.done:
         return done(context);
     }
-    return tiamat.Text.label(widget.state.toString());
   }
 
   Widget askSetupCrossSigning() {
@@ -365,6 +370,84 @@ class _MatrixCrossSigningViewState extends State<MatrixCrossSigningView> {
                   isActionLoading = false;
                 });
               })
+        ],
+      ),
+    );
+  }
+
+  Widget unlockSsssWidget() {
+    return SizedBox(
+      width: 400,
+      child: m.Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          m.Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              tiamat.Text.label(labelMatrixRecoveryKeyPromptExplanation),
+              const SizedBox(height: 8),
+              tiamat.TextInput(
+                placeholder: promptMatrixRecoveryKeyInput,
+                controller: keyInputController,
+                obscureText: true,
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          tiamat.Button(
+              text: CommonStrings.promptConfirm,
+              isLoading: isActionLoading,
+              onTap: () async {
+                setState(() {
+                  isActionLoading = true;
+                });
+
+                await Future.delayed(Duration(milliseconds: 300));
+
+                await ErrorUtils.tryRun(context, () async {
+                  await widget.unlockSsss?.call(keyInputController.text);
+                });
+
+                setState(() {
+                  isActionLoading = false;
+                });
+              })
+        ],
+      ),
+    );
+  }
+
+  Widget askBadSsss() {
+    return m.SizedBox(
+      width: 500,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          tiamat.Text.label(
+              "Some of your secure backup data couldn't be read and may be lost. You can continue setting up encryption (some old messages may stay unreadable) or cancel."),
+          const SizedBox(
+            height: 50,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              tiamat.Button.danger(
+                text: CommonStrings.promptContinue,
+                onTap: () => widget.ignoreBadSsss?.call(true),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              tiamat.Button.secondary(
+                text: CommonStrings.promptCancel,
+                onTap: () => widget.ignoreBadSsss?.call(false),
+              ),
+            ],
+          )
         ],
       ),
     );

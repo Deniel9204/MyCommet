@@ -77,6 +77,23 @@ class MatrixCrossSigningPageState extends State<MatrixCrossSigningPage> {
               .selfSign(keyOrPassphrase: key);
         }
       },
+      unlockSsss: (key) async {
+        // Unlock the existing storage so its secrets can be migrated, then
+        // advance the bootstrap. A wrong key throws and is surfaced by the
+        // view's error handling, leaving the state on askUnlockSsss to retry.
+        final oldKeys = bootstrapper?.oldSsssKeys?.values;
+        if (oldKeys != null) {
+          for (final oldKey in oldKeys) {
+            if (!oldKey.isUnlocked) {
+              await oldKey.unlock(keyOrPassphrase: key);
+            }
+          }
+        }
+        bootstrapper?.unlockedSsss();
+      },
+      ignoreBadSsss: (ignore) {
+        bootstrapper?.ignoreBadSecrets(ignore);
+      },
       wipeCrossSigning: (wipe) {
         bootstrapper?.wipeCrossSigning(wipe);
       },
