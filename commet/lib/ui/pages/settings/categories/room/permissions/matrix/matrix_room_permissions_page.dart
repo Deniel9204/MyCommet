@@ -1,6 +1,7 @@
 import 'package:commet/debug/log.dart';
 import 'package:commet/main.dart';
 import 'package:commet/ui/pages/settings/categories/room/permissions/matrix/matrix_room_permissions_view.dart';
+import 'package:commet/utils/power_levels_content.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart' as matrix;
@@ -503,34 +504,41 @@ class _MatrixRoomPermissionsPageState extends State<MatrixRoomPermissionsPage> {
     );
   }
 
-  Future<void> setPermissions(
+  /// Pushes the edited permissions to the server. Returns true on success and
+  /// false if the homeserver rejected the change (e.g. the user lacks the power
+  /// level to edit permissions) so the caller can surface it instead of
+  /// silently pretending the edit applied.
+  Future<bool> setPermissions(
     List<MatrixRoomPermissionEntry> permissions,
   ) async {
     var mxRoom = widget.room;
     var event = mxRoom.states["m.room.power_levels"]?[""];
-    var content = event?.content ?? {};
 
-    for (var perm in permissions) {
-      if (perm.powerLevel == perm.originalPowerLevel) {
-        continue;
-      }
+    // Build the new content from a deep copy rather than mutating the cached
+    // state event in place, so a rejected request doesn't leave the local
+    // state looking as if the change went through.
+    final base = Map<String, dynamic>.from(event?.content ?? const {});
+    final changes = permissions
+        .where((perm) => perm.powerLevel != perm.originalPowerLevel)
+        .map((perm) => (
+              key: perm.key,
+              parent: perm.keyParent,
+              powerLevel: perm.powerLevel,
+            ));
 
-      var map = content;
-      if (perm.keyParent != null) {
-        if (map.containsKey(perm.keyParent!) == false) {
-          map[perm.keyParent!] = Map<String, dynamic>();
-        }
-        map = map[perm.keyParent]! as Map<String, dynamic>;
-      }
+    final content = applyPowerLevelChanges(base, changes);
 
-      map[perm.key] = perm.powerLevel;
+    try {
+      await mxRoom.client.setRoomStateWithKey(
+        mxRoom.id,
+        "m.room.power_levels",
+        "",
+        content,
+      );
+      return true;
+    } catch (e, s) {
+      Log.onError(e, s, content: "Failed to update room power levels");
+      return false;
     }
-
-    await mxRoom.client.setRoomStateWithKey(
-      mxRoom.id,
-      "m.room.power_levels",
-      "",
-      content,
-    );
   }
 }
