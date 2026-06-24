@@ -80,6 +80,51 @@ void main() {
     });
   });
 
+  group('formatRelativeTime', () {
+    final now = DateTime(2026, 6, 23, 12, 0, 0);
+
+    String ago(Duration d) => formatRelativeTime(now.subtract(d), now);
+
+    test('under a minute is "now"', () {
+      expect(ago(Duration.zero), 'now');
+      expect(ago(const Duration(seconds: 59)), 'now');
+    });
+
+    test('minutes', () {
+      expect(ago(const Duration(minutes: 1)), '1m');
+      expect(ago(const Duration(minutes: 59)), '59m');
+    });
+
+    test('hours', () {
+      expect(ago(const Duration(hours: 1)), '1h');
+      expect(ago(const Duration(hours: 23)), '23h');
+    });
+
+    test('days', () {
+      expect(ago(const Duration(days: 1)), '1d');
+      expect(ago(const Duration(days: 6)), '6d');
+    });
+
+    test('weeks', () {
+      expect(ago(const Duration(days: 7)), '1w');
+      expect(ago(const Duration(days: 29)), '4w');
+    });
+
+    test('months', () {
+      expect(ago(const Duration(days: 30)), '1mo');
+      expect(ago(const Duration(days: 364)), '12mo');
+    });
+
+    test('years', () {
+      expect(ago(const Duration(days: 365)), '1y');
+      expect(ago(const Duration(days: 365 * 2)), '2y');
+    });
+
+    test('future timestamps clamp to "now"', () {
+      expect(formatRelativeTime(now.add(const Duration(hours: 5)), now), 'now');
+    });
+  });
+
   group('TimeFormatPreference', () {
     test('round-trips every storage value', () {
       for (final p in TimeFormatPreference.values) {

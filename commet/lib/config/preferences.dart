@@ -414,6 +414,11 @@ class Preferences {
   BoolPreference relativeTimestamps =
       BoolPreference("relative_timestamps", defaultValue: false);
 
+  /// When true, per-message timestamps show a compact relative time
+  /// ("5m", "2h", "3d") instead of the absolute time of day.
+  BoolPreference relativeMessageTimestamps =
+      BoolPreference("relative_message_timestamps", defaultValue: false);
+
   BoolPreference silenceNotifications = BoolPreference(
       "silence_notifications_when_other_device_active",
       defaultValue: true);
