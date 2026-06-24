@@ -9,7 +9,6 @@ import 'package:commet/client/components/pinned_messages/pinned_messages_compone
 import 'package:commet/client/components/polls/poll_component.dart';
 import 'package:commet/client/components/push_notification/notification_content.dart';
 import 'package:commet/client/components/push_notification/notification_manager.dart';
-import 'package:commet/client/matrix/timeline_events/matrix_timeline_event.dart';
 import 'package:commet/client/timeline.dart';
 import 'package:commet/client/timeline_events/timeline_event.dart';
 import 'package:commet/client/timeline_events/timeline_event_emote.dart';
@@ -337,10 +336,21 @@ class TimelineEventMenu {
           name: "Retry Decrypt",
           icon: Icons.lock_open,
           action: (context) {
-            var mx = (event as MatrixTimelineEvent).event;
-
             ErrorUtils.tryRun(context, () async {
-              await mx.requestKey();
+              await (event as TimelineEventEncrypted)
+                  .attemptDecrypt(timeline.room);
+            });
+
+            onActionFinished?.call();
+          },
+        ),
+      if (event is TimelineEventEncrypted)
+        TimelineEventMenuEntry(
+          name: "Decrypt all messages",
+          icon: Icons.lock_reset,
+          action: (context) {
+            ErrorUtils.tryRun(context, () async {
+              await timeline.room.redecryptFailedEvents();
             });
 
             onActionFinished?.call();

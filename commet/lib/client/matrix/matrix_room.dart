@@ -49,6 +49,7 @@ import 'package:commet/config/build_config.dart';
 import 'package:commet/debug/log.dart';
 import 'package:commet/main.dart';
 import 'package:commet/utils/assignable_roles.dart';
+import 'package:commet/utils/decrypt_retry_plan.dart';
 import 'package:commet/utils/image_utils.dart';
 import 'package:commet/utils/mime.dart';
 import 'package:commet/utils/room_shortcut_image.dart';
@@ -704,6 +705,44 @@ class MatrixRoom extends Room {
     }
 
     return convertEvent(event);
+  }
+
+  @override
+  Future<int> redecryptFailedEvents() async {
+    final tl = _timeline;
+    if (tl == null) return 0;
+
+    final descriptors = <EncryptedEventDescriptor>[];
+    for (final event in tl.events) {
+      if (event is! MatrixTimelineEvent) continue;
+      final mxe = event.event;
+      descriptors.add((
+        eventId: mxe.eventId,
+        isUndecryptable: mxe.type == matrix.EventTypes.Encrypted &&
+            mxe.messageType == matrix.MessageTypes.BadEncrypted,
+        canRequestSession: mxe.content['can_request_session'] == true,
+        sessionId: mxe.content.tryGet<String>('session_id'),
+        senderKey: mxe.content.tryGet<String>('sender_key'),
+      ));
+    }
+
+    final plan = planDecryptRetry(descriptors);
+
+    // Request each distinct megolm session once. The SDK re-decrypts the
+    // affected timeline events and fires onUpdate when the keys arrive, so the
+    // UI refreshes itself — we deliberately don't re-fetch per event, which
+    // would re-issue one request per event instead of one per session.
+    for (final key in plan.keysToRequest) {
+      final senderKey = key.senderKey;
+      if (senderKey == null) continue;
+      try {
+        await _matrixRoom.requestSessionKey(key.sessionId, senderKey);
+      } catch (e, s) {
+        Log.onError(e, s);
+      }
+    }
+
+    return plan.eventIdsToRefresh.length;
   }
 
   @override

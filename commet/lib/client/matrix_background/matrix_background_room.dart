@@ -293,6 +293,9 @@ class MatrixBackgroundRoom implements Room {
   }
 
   @override
+  Future<int> redecryptFailedEvents() async => 0;
+
+  @override
   Member getMemberOrFallback(String id) {
     throw UnimplementedError();
   }
