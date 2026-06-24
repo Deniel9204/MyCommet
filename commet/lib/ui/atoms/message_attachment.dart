@@ -145,7 +145,8 @@ class _MessageAttachmentState extends State<MessageAttachment> {
   void fullscreenAttachment() {
     if (widget.attachment is ImageAttachment) {
       final attachment = widget.attachment as ImageAttachment;
-      Lightbox.show(context, image: attachment.image);
+      Lightbox.show(context,
+          image: attachment.image, downloadAttachment: attachment);
     }
 
     if (widget.attachment is VideoAttachment) {
