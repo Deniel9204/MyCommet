@@ -205,6 +205,15 @@ abstract class Client {
   /// Set the display name of the current user
   Future<void> setDisplayName(String name);
 
+  /// User IDs the current account is ignoring (m.ignored_user_list)
+  List<String> get ignoredUsers;
+
+  /// Whether [userId] is currently ignored by this account
+  bool isUserIgnored(String userId) => ignoredUsers.contains(userId);
+
+  /// Ignore or un-ignore [userId]
+  Future<void> setUserIgnored(String userId, bool ignored);
+
   /// End the current session and prepare for disposal
   Future<void> close();
 

@@ -642,6 +642,16 @@ class MatrixClient extends Client {
   }
 
   @override
+  List<String> get ignoredUsers => _matrixClient.ignoredUsers;
+
+  @override
+  Future<void> setUserIgnored(String userId, bool ignored) {
+    return ignored
+        ? _matrixClient.ignoreUser(userId)
+        : _matrixClient.unignoreUser(userId);
+  }
+
+  @override
   Iterable<Room> getEligibleRoomsForSpace(Space space) {
     return rooms.where((room) => !space.containsRoom(room.identifier));
   }
