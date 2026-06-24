@@ -1,4 +1,5 @@
 import 'package:commet/utils/common_strings.dart';
+import 'package:commet/utils/uia_stage.dart';
 import 'package:flutter/widgets.dart';
 // have to do it this way to avoid some widgetbook codegen issue
 // ignore: implementation_imports
@@ -8,10 +9,23 @@ import 'package:tiamat/tiamat.dart' as tiamat;
 import 'package:flutter/material.dart' as material;
 
 class MatrixUIARequestView extends StatefulWidget {
-  const MatrixUIARequestView(this.state,
-      {this.onSubmitAuthentication, super.key, this.onFail, this.onSuccess});
+  const MatrixUIARequestView(
+    this.state, {
+    this.stage = UiaStageKind.password,
+    this.onSubmitAuthentication,
+    this.onOpenSso,
+    this.onCompleteSso,
+    this.onCancel,
+    super.key,
+    this.onFail,
+    this.onSuccess,
+  });
   final UiaRequestState state;
+  final UiaStageKind stage;
   final Function(String password)? onSubmitAuthentication;
+  final Function()? onOpenSso;
+  final Function()? onCompleteSso;
+  final Function()? onCancel;
   final Function()? onSuccess;
   final Function()? onFail;
 
@@ -39,7 +53,21 @@ class _MatrixUIARequestViewState extends State<MatrixUIARequestView> {
       case UiaRequestState.loading:
         return loading();
       case UiaRequestState.waitForUser:
+        return waitForUser();
+    }
+  }
+
+  Widget waitForUser() {
+    switch (widget.stage) {
+      case UiaStageKind.password:
         return userPasswordInput();
+      case UiaStageKind.sso:
+        return ssoInput();
+      case UiaStageKind.dummy:
+        // The controller completes the dummy stage automatically.
+        return loading();
+      case UiaStageKind.unsupported:
+        return unsupported();
     }
   }
 
@@ -66,6 +94,73 @@ class _MatrixUIARequestViewState extends State<MatrixUIARequestView> {
                   )),
             ))
       ],
+    );
+  }
+
+  Widget ssoInput() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: tiamat.Text(
+              "Authenticate with your single sign-on provider, then continue."),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                height: 40,
+                child: Button(
+                  text: "Open sign-on",
+                  onTap: () => widget.onOpenSso?.call(),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                height: 40,
+                child: Button(
+                  text: CommonStrings.promptContinue,
+                  onTap: () => widget.onCompleteSso?.call(),
+                ),
+              ),
+            ),
+          ],
+        ),
+        cancelButton(),
+      ],
+    );
+  }
+
+  Widget unsupported() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: tiamat.Text(
+              "This account requires an authentication method that isn't supported in the app yet."),
+        ),
+        cancelButton(),
+      ],
+    );
+  }
+
+  Widget cancelButton() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: 40,
+        width: 120,
+        child: tiamat.Button.danger(
+          text: CommonStrings.promptCancel,
+          onTap: () => widget.onCancel?.call(),
+        ),
+      ),
     );
   }
 
