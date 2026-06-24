@@ -181,6 +181,11 @@ class MatrixBackgroundClient implements Client {
   }
 
   @override
+  Future<PublicRoomsResult> searchPublicRooms(
+          {String? query, String? server, String? since}) =>
+      throw UnimplementedError();
+
+  @override
   Space? getSpace(String identifier) {
     throw UnimplementedError();
   }
