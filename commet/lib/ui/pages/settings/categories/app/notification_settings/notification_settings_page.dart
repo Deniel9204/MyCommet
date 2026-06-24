@@ -93,6 +93,17 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   Widget buildNotificationSettings() {
     return Column(
       children: [
+        BooleanPreferenceToggle(
+          preference: preferences.doNotDisturb,
+          title: "Do Not Disturb",
+          description: "Suppress all notifications while enabled",
+        ),
+        BooleanPreferenceToggle(
+          preference: preferences.hideNotificationContent,
+          title: "Hide notification content",
+          description:
+              "Replace message text and details with a generic placeholder in notifications",
+        ),
         if (PlatformUtils.isAndroid)
           BooleanPreferenceToggle(
             preference: preferences.silenceNotifications,

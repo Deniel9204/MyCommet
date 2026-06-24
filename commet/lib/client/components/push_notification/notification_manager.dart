@@ -3,6 +3,8 @@ import 'package:commet/client/components/push_notification/android/android_notif
 import 'package:commet/client/components/push_notification/android/firebase_push_notifier.dart';
 import 'package:commet/client/components/push_notification/android/unified_push_notifier.dart';
 import 'package:commet/client/components/push_notification/linux/linux_notifier.dart';
+import 'package:commet/client/components/push_notification/modifiers/do_not_disturb.dart';
+import 'package:commet/client/components/push_notification/modifiers/hide_content.dart';
 import 'package:commet/client/components/push_notification/modifiers/linux_notification_formatting.dart';
 import 'package:commet/client/components/push_notification/modifiers/notification_modifiers.dart';
 import 'package:commet/client/components/push_notification/modifiers/suppress_active_room.dart';
@@ -45,6 +47,11 @@ class NotificationManager {
     if (BuildConfig.ANDROID) {
       addModifier(NotificationModifierSuppressOtherActiveDevice());
     }
+
+    // Registered unconditionally; each is a no-op unless its preference is on,
+    // so toggling the setting takes effect without re-initializing.
+    addModifier(NotificationModifierDoNotDisturb());
+    addModifier(NotificationModifierHideContent());
 
     if (PlatformUtils.isLinux) {
       addModifier(NotificationModifierLinuxFormatting());
@@ -109,6 +116,9 @@ class NotificationManager {
       if (forceShow) {
         if (modifier is NotificationModifierSuppressActiveRoom) continue;
         if (modifier is NotificationModifierSuppressOtherActiveDevice) continue;
+        // Do-not-disturb is a suppressor too; an explicitly forced notification
+        // should still be shown. Hide-content still applies (it only redacts).
+        if (modifier is NotificationModifierDoNotDisturb) continue;
       }
 
       content = await modifier.process(content!);
