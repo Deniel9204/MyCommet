@@ -1060,6 +1060,12 @@ class MessageInputState extends State<MessageInput> {
               contextMenuBuilder: contextMenuBuilder,
               keyboardType: TextInputType.multiline,
               textCapitalization: TextCapitalization.sentences,
+              spellCheckConfiguration: preferences.spellcheckEnabled.value
+                  ? const SpellCheckConfiguration(
+                      misspelledTextStyle:
+                          TextField.materialMisspelledTextStyle,
+                    )
+                  : const SpellCheckConfiguration.disabled(),
               decoration: InputDecoration(
                   contentPadding:
                       EdgeInsets.fromLTRB(8, padding / 2, 4, padding / 2),
