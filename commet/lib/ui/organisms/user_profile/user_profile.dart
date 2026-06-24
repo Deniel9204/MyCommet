@@ -240,6 +240,7 @@ class _UserProfileState extends State<UserProfile> {
         setColorOverride: setColorOverride,
         showSource: showSource,
         onSetStatus: setStatus,
+        onSetPresence: setPresenceState,
         clearStatus: clearStatus,
         shareCurrentTimezone: shareTimezone,
         pronouns: pronouns,
@@ -413,6 +414,46 @@ class _UserProfileState extends State<UserProfile> {
 
     setState(() {
       presence = UserPresence(UserPresenceStatus.online);
+    });
+  }
+
+  Future<void> setPresenceState() async {
+    const states = [
+      UserPresenceStatus.online,
+      UserPresenceStatus.unavailable,
+      UserPresenceStatus.offline,
+    ];
+
+    String labelFor(UserPresenceStatus status) => switch (status) {
+          UserPresenceStatus.online => UserProfileViewState.presenceLabelOnline,
+          UserPresenceStatus.unavailable =>
+            UserProfileViewState.presenceLabelAway,
+          UserPresenceStatus.offline =>
+            UserProfileViewState.presenceLabelOffline,
+          UserPresenceStatus.unknown =>
+            UserProfileViewState.presenceLabelOffline,
+        };
+
+    final picked = await AdaptiveDialog.pickOne<UserPresenceStatus>(
+      context,
+      title: UserProfileViewState.promptProfileSetPresence,
+      items: states,
+      itemBuilder: (context, item, callback) => SizedBox(
+        height: 50,
+        child: tiamat.TextButton(labelFor(item), onTap: callback),
+      ),
+    );
+
+    if (picked == null) return;
+
+    // setStatus with no message preserves any existing status message
+    // (the SDK falls back to the current one).
+    await widget.client
+        .getComponent<UserPresenceComponent>()
+        ?.setStatus(picked);
+
+    setState(() {
+      presence = UserPresence(picked, message: presence?.message);
     });
   }
 
