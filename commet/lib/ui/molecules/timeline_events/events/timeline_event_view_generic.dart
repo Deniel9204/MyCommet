@@ -1,5 +1,6 @@
 import 'package:commet/client/client.dart';
 import 'package:commet/client/timeline_events/timeline_event.dart';
+import 'package:commet/client/timeline_events/timeline_event_emote.dart';
 import 'package:commet/client/timeline_events/timeline_event_generic.dart';
 import 'package:commet/ui/molecules/read_indicator.dart';
 import 'package:commet/ui/molecules/timeline_events/timeline_event_layout.dart';
@@ -145,6 +146,15 @@ class _TimelineEventViewGenericState extends State<TimelineEventViewGeneric>
 
   void loadStateFromEvent(TimelineEvent event) {
     var room = widget.room ?? widget.timeline?.room;
+
+    // "/me" actions render as "* <name> <action>" with the sender's avatar.
+    if (event is TimelineEventEmote && room != null) {
+      var sender = room.getMemberOrFallback(event.senderId);
+      text = "* ${sender.displayName} ${event.plainTextBody}";
+      senderAvatar = sender.avatar;
+      return;
+    }
+
     if (event is! TimelineEventGeneric) {
       text = event.plainTextBody;
       icon = Icons.question_mark;
