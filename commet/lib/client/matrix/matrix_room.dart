@@ -50,6 +50,7 @@ import 'package:commet/debug/log.dart';
 import 'package:commet/main.dart';
 import 'package:commet/utils/image_utils.dart';
 import 'package:commet/utils/mime.dart';
+import 'package:commet/utils/room_shortcut_image.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as html_dom;
 import 'package:html/parser.dart' as html_parser;
@@ -668,24 +669,22 @@ class MatrixRoom extends Room {
 
   @override
   Future<ImageProvider?> getShortcutImage() async {
-    if (avatar != null) return avatar;
-
     final comp = client.getComponent<DirectMessagesComponent>();
 
-    if (comp?.isRoomDirectMessage(this) == true) {
-      var user = await client
-          .getComponent<UserProfileComponent>()!
-          .getProfile(comp!.getDirectMessagePartnerId(this)!);
-
-      if (user.avatar != null) {
+    return resolveRoomShortcutImage<ImageProvider>(
+      roomAvatar: avatar,
+      isDirectMessage: comp?.isRoomDirectMessage(this) == true,
+      directMessagePartnerAvatar: () async {
+        final user = await client
+            .getComponent<UserProfileComponent>()!
+            .getProfile(comp!.getDirectMessagePartnerId(this)!);
         return user.avatar;
-      }
-    }
-
-    return client.spaces
-        .where((space) => space.containsRoom(identifier))
-        .firstOrNull
-        ?.avatar;
+      },
+      spaceAvatar: () => client.spaces
+          .where((space) => space.containsRoom(identifier))
+          .firstOrNull
+          ?.avatar,
+    );
   }
 
   @override

@@ -16,6 +16,7 @@ import 'package:commet/client/permissions.dart';
 import 'package:commet/client/role.dart';
 import 'package:commet/client/timeline_events/timeline_event.dart';
 import 'package:commet/debug/log.dart';
+import 'package:commet/utils/room_shortcut_image.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/painting/image_provider.dart';
@@ -303,7 +304,33 @@ class MatrixBackgroundRoom implements Room {
 
   @override
   Future<ImageProvider<Object>?> getShortcutImage() async {
-    return null;
+    // Headless rooms are often handed out by getRoom() without init() having
+    // run, so resolve the room avatar from the cached state on demand rather
+    // than relying on the [avatar] field already being populated (#945).
+    var roomAvatar = avatar;
+    if (roomAvatar == null) {
+      final url = avatarId;
+      if (url != null) {
+        roomAvatar = await MatrixBackgroundMember.uriToCachedMxcImageProvider(
+            Uri.parse(url));
+        avatar = roomAvatar;
+      }
+    }
+
+    final dms = client.getComponent<DirectMessagesComponent>();
+
+    return resolveRoomShortcutImage<ImageProvider<Object>>(
+      roomAvatar: roomAvatar,
+      isDirectMessage: dms?.isRoomDirectMessage(this) == true,
+      directMessagePartnerAvatar: () async {
+        final partnerId = dms?.getDirectMessagePartnerId(this);
+        if (partnerId == null) return null;
+        final partner = await fetchMember(partnerId);
+        return partner.avatar;
+      },
+      // The headless client has no loaded space hierarchy to fall back to.
+      spaceAvatar: () => null,
+    );
   }
 
   @override

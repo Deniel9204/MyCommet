@@ -127,7 +127,7 @@ class BackgroundNotificationsManager {
           roomId: room.identifier,
           clientId: client.identifier,
           senderImage: user.avatar,
-          roomImage: room.avatar,
+          roomImage: await room.getShortcutImage(),
           isDirectMessage: isDirectMessage);
 
       await NotificationManager.notify(content);
