@@ -423,6 +423,15 @@ class Preferences {
       "silence_notifications_when_other_device_active",
       defaultValue: true);
 
+  /// When true, suppress all notifications (do-not-disturb).
+  BoolPreference doNotDisturb =
+      BoolPreference("do_not_disturb", defaultValue: false);
+
+  /// When true, hide message content in notifications, showing a generic
+  /// placeholder instead.
+  BoolPreference hideNotificationContent =
+      BoolPreference("hide_notification_content", defaultValue: false);
+
   BoolPreference showNotificationBadgesInTaskbar =
       BoolPreference("show_notification_badges_in_taskbar", defaultValue: true);
 
