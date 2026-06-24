@@ -38,6 +38,14 @@ class InMemoryCache<T> {
     return _cache[key]?.$1;
   }
 
+  /// Explicitly drops [key] from the cache, e.g. once its value is known to
+  /// have changed. Unlike size/TTL eviction this does not emit on [onRemove],
+  /// since it is a deliberate invalidation rather than the cache giving up an
+  /// entry a listener might want to react to.
+  void remove(String key) {
+    _cache.remove(key);
+  }
+
   Future<void> clean() async {
     var keys = _cache.keys.toList();
 

@@ -13,6 +13,7 @@ import 'package:commet/client/matrix/matrix_mxc_image_provider.dart';
 import 'package:commet/debug/log.dart';
 import 'package:commet/ui/atoms/rich_text/matrix_html_parser.dart';
 import 'package:commet/utils/color_utils.dart';
+import 'package:commet/utils/in_memory_cache.dart';
 import 'package:commet/utils/text_utils.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
@@ -338,14 +339,26 @@ class MatrixProfileComponent implements UserProfileComponent<MatrixClient> {
   @override
   MatrixClient client;
 
+  /// Caches the (rarely-changing) profile fields fetched from the server so
+  /// avatar/name re-renders don't hit `/profile` on every display (#938).
+  /// Presence is intentionally left out of the cache and refetched on every
+  /// call, since it changes far more often than the profile itself.
+  final InMemoryCache<Map<String, dynamic>> _profileFields =
+      InMemoryCache(limit: 256);
+
   MatrixProfileComponent(this.client);
 
   @override
   Future<Profile> getProfile(String identifier) async {
     try {
-      var fields = await client.matrixClient.request(RequestType.GET,
-          "/client/v3/profile/${Uri.encodeComponent(identifier)}");
-      fields["user_id"] = identifier;
+      var fields = _profileFields.get(identifier);
+      if (fields == null) {
+        final response = await client.matrixClient.request(RequestType.GET,
+            "/client/v3/profile/${Uri.encodeComponent(identifier)}");
+        response["user_id"] = identifier;
+        fields = Map<String, dynamic>.from(response);
+        _profileFields.put(identifier, fields);
+      }
 
       var precense = await client
           .getComponent<UserPresenceComponent>()
@@ -386,6 +399,8 @@ class MatrixProfileComponent implements UserProfileComponent<MatrixClient> {
         "/client/v3/profile/${Uri.encodeComponent(client.self!.identifier)}/$field",
         data: data);
 
+    _profileFields.remove(client.self!.identifier);
+
     print(response);
   }
 
@@ -394,6 +409,8 @@ class MatrixProfileComponent implements UserProfileComponent<MatrixClient> {
       RequestType.DELETE,
       "/client/v3/profile/${Uri.encodeComponent(client.self!.identifier)}/$field",
     );
+
+    _profileFields.remove(client.self!.identifier);
 
     print(response);
   }
