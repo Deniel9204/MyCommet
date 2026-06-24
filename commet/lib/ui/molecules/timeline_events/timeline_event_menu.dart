@@ -77,6 +77,12 @@ class TimelineEventMenu {
         name: "promptReportMessage",
       );
 
+  String get promptForwardMessage => Intl.message(
+        "Forward",
+        desc: "Label for the menu option to forward a message to another room",
+        name: "promptForwardMessage",
+      );
+
   String get promptShowSource => Intl.message(
         "Show Source",
         desc: "Label for the menu option to view the JSON source of an event",
@@ -404,6 +410,33 @@ class TimelineEventMenu {
           onActionFinished?.call();
         },
       ),
+      if (event is TimelineEventMessage)
+        TimelineEventMenuEntry(
+          name: promptForwardMessage,
+          icon: Icons.forward,
+          action: (context) async {
+            var target = await AdaptiveDialog.pickOne(
+              context,
+              title: promptForwardMessage,
+              items: timeline.client.rooms.toList(),
+              itemBuilder: (context, room, callback) => Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: callback,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(room.displayName),
+                  ),
+                ),
+              ),
+            );
+            if (target == null) return;
+            await ErrorUtils.tryRun(context, () async {
+              await target.sendMessage(message: event.plainTextBody);
+            });
+            onActionFinished?.call();
+          },
+        ),
       if (canReplyInThread)
         TimelineEventMenuEntry(
           name: promptReplyInThread,
