@@ -127,7 +127,19 @@ class _ExploreRoomsViewState extends State<ExploreRoomsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(labelExploreRooms)),
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(labelExploreRooms),
+            Text(
+              widget.client.self?.displayName ?? widget.client.identifier,
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           Padding(
