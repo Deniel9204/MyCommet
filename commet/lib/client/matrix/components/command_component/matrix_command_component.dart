@@ -43,6 +43,11 @@ class MatrixCommandComponent extends CommandComponent<MatrixClient> {
   Future<void> executeCommand(String string, Room room,
       {TimelineEvent? interactingEvent, EventInteractionType? type}) async {
     var mxRoom = (room as MatrixRoom).matrixRoom;
+
+    // A bare "/me" with no action text would send an empty emote, which renders
+    // as an "unknown message format" fallback. Ignore it.
+    if (string.trim() == "/me") return;
+
     matrix.Event? event;
     if (interactingEvent != null) {
       event = (interactingEvent as MatrixTimelineEvent).event;
