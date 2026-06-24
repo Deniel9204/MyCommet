@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:collection/collection.dart';
+import 'package:commet/client/alert.dart';
 import 'package:commet/client/client.dart';
 import 'package:commet/client/client_manager.dart';
 import 'package:commet/client/components/direct_messages/direct_message_component.dart';
@@ -19,6 +20,7 @@ import 'package:commet/ui/organisms/invitation_view/send_invitation.dart';
 import 'package:commet/ui/organisms/update_installed_dialog/update_installed_dialog.dart';
 import 'package:commet/ui/organisms/user_profile/user_profile.dart';
 import 'package:commet/ui/pages/get_or_create_room/get_or_create_room.dart';
+import 'package:commet/ui/pages/settings/categories/account/security/matrix/cross_signing/cross_signing_page.dart';
 import 'package:commet/ui/pages/settings/donation_rewards_confirmation.dart';
 import 'package:commet/ui/pages/settings/settings_page.dart';
 import 'package:commet/ui/pages/setup/setup_page.dart';
@@ -169,6 +171,9 @@ class MainPageState extends State<MainPage> {
       if (mounted) setState(() {});
     });
 
+    // Re-check after sync: encryption state isn't loaded yet at first frame.
+    clientManager.onSync.stream.listen((_) => checkEncryptionSetup());
+
     SchedulerBinding.instance.scheduleFrameCallback(onFirstFrame);
 
     checkDonationFlow();
@@ -199,6 +204,44 @@ class MainPageState extends State<MainPage> {
           },
         );
       }
+
+      checkEncryptionSetup();
+    }
+  }
+
+  String get labelSetupEncryption => Intl.message("Set up encryption",
+      name: "labelSetupEncryption",
+      desc: "Alert title prompting the user to set up encryption");
+
+  String get labelSetupEncryptionDescription => Intl.message(
+      "Verify this session and back up your keys so you don't lose access to encrypted messages.",
+      name: "labelSetupEncryptionDescription",
+      desc: "Alert body prompting the user to set up encryption");
+
+  final Set<String> _encryptionAlertShownFor = {};
+
+  void checkEncryptionSetup() {
+    for (final client in clientManager.clients) {
+      if (_encryptionAlertShownFor.contains(client.identifier)) continue;
+      if (client.encryptionSetupComplete) continue;
+      if (client is! MatrixClient) continue;
+      _encryptionAlertShownFor.add(client.identifier);
+      clientManager.alertManager.addAlert(Alert(
+        AlertType.warning,
+        titleGetter: () => labelSetupEncryption,
+        messageGetter: () => labelSetupEncryptionDescription,
+        action: (context) {
+          AdaptiveDialog.show(
+            context,
+            dismissible: true,
+            title: labelSetupEncryption,
+            builder: (_) => MatrixCrossSigningPage(
+              client: client,
+              onComplete: () {},
+            ),
+          );
+        },
+      ));
     }
   }
 

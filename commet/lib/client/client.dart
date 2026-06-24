@@ -114,6 +114,10 @@ abstract class Client {
   /// True if the client protocol supports End to End Encryption
   bool get supportsE2EE;
 
+  /// Whether the account's encryption is fully set up (cross-signing + key
+  /// backup). Used to prompt the user to finish setup after login.
+  bool get encryptionSetupComplete => true;
+
   /// Max size in bytes for uploaded files
   int? get maxFileSize;
 
