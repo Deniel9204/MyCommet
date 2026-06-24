@@ -239,6 +239,11 @@ abstract class Room {
 
   Future<TimelineEvent?> getEvent(String eventId);
 
+  /// Re-requests megolm keys for any timeline events that failed to decrypt,
+  /// deduplicated by session. Returns the number of still-undecryptable events
+  /// it attempted to recover.
+  Future<int> redecryptFailedEvents();
+
   Future<void> kickUser(String id);
 
   Future<void> banUser(String id);
