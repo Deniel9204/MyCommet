@@ -222,6 +222,8 @@ class _UserProfileState extends State<UserProfile> {
         showMessageButton: widget.showMessageButton,
         isSelf: widget.client.self!.identifier == profile!.identifier,
         onMessageButtonClicked: openDirectMessage,
+        isIgnored: widget.client.isUserIgnored(profile!.identifier),
+        onToggleIgnore: toggleIgnore,
         onSetBanner: setBanner,
         setPreviewColor: setPreviewColor,
         setPreviewBrightness: setPreviewBrightness,
@@ -246,6 +248,12 @@ class _UserProfileState extends State<UserProfile> {
             null,
       ),
     );
+  }
+
+  Future<void> toggleIgnore() async {
+    final id = profile!.identifier;
+    await widget.client.setUserIgnored(id, !widget.client.isUserIgnored(id));
+    if (mounted) setState(() {});
   }
 
   Future<void> openDirectMessage() async {

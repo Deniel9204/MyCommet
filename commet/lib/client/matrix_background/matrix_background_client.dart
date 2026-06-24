@@ -249,6 +249,15 @@ class MatrixBackgroundClient implements Client {
   }
 
   @override
+  List<String> get ignoredUsers => const [];
+
+  @override
+  bool isUserIgnored(String userId) => ignoredUsers.contains(userId);
+
+  @override
+  Future<void> setUserIgnored(String userId, bool ignored) async {}
+
+  @override
   Future<(bool, List<LoginFlow>?)> setHomeserver(Uri uri) {
     throw UnimplementedError();
   }

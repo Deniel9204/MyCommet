@@ -53,7 +53,9 @@ class UserProfileView extends StatefulWidget {
       this.pronouns = const [],
       this.clearStatus,
       this.savePreviewTheme,
-      this.onMessageButtonClicked});
+      this.onMessageButtonClicked,
+      this.isIgnored = false,
+      this.onToggleIgnore});
   final ImageProvider? userAvatar;
   final ImageProvider? userBanner;
   final UserPresence? presence;
@@ -86,6 +88,8 @@ class UserProfileView extends StatefulWidget {
   final Future<void> Function(Brightness)? setPreviewBrightness;
   final Future<void> Function()? onMessageButtonClicked;
   final Future<void> Function()? savePreviewTheme;
+  final bool isIgnored;
+  final Future<void> Function()? onToggleIgnore;
   final Future<void> Function(Color?)? setColorOverride;
 
   @override
@@ -486,6 +490,11 @@ class UserProfileViewState extends State<UserProfileView> {
 
   List<tiamat.ContextMenuItem> contextMenuItems(BuildContext context) {
     return [
+      if (!widget.isSelf && widget.onToggleIgnore != null)
+        tiamat.ContextMenuItem(
+            text: widget.isIgnored ? "Unblock user" : "Block user",
+            onPressed: () => widget.onToggleIgnore?.call(),
+            icon: widget.isIgnored ? Icons.person_add_alt_1 : Icons.block),
       if (widget.isSelf)
         tiamat.ContextMenuItem(
             text: promptProfileChangeBanner,

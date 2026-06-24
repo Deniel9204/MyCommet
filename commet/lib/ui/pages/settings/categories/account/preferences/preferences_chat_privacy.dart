@@ -59,6 +59,21 @@ class _ChatPrivacyPreferences extends State<ChatPrivacyPreferences> {
           "description for the toggle for enabling and disabling the automatic blocking of invitations",
       name: "labelAllowInvitationsDescription");
 
+  String get labelBlockedUsersTitle => Intl.message("Blocked users",
+      desc: "Header for the list of blocked/ignored users in privacy settings",
+      name: "labelBlockedUsersTitle");
+
+  String get labelUnblock => Intl.message("Unblock",
+      desc: "Label for the button to unblock a previously blocked user",
+      name: "labelUnblock");
+
+  Future<void> unblock(String userId) async {
+    await ErrorUtils.tryRun(context, () async {
+      await widget.client.setUserIgnored(userId, false);
+    });
+    if (mounted) setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -100,6 +115,24 @@ class _ChatPrivacyPreferences extends State<ChatPrivacyPreferences> {
           title: labelAllowInvitationsToggle,
           description: labelAllowInvitationsDescription,
         ),
+        if (widget.client.ignoredUsers.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: tiamat.Text.labelLow(labelBlockedUsersTitle),
+            ),
+          ),
+        for (final userId in widget.client.ignoredUsers)
+          ListTile(
+            dense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+            title: Text(userId),
+            trailing: TextButton(
+              onPressed: () => unblock(userId),
+              child: Text(labelUnblock),
+            ),
+          ),
       ]),
     );
   }
