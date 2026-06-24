@@ -237,6 +237,12 @@ Future<void> initNecessary() async {
 Future<void> initGuiRequirements() async {
   isHeadless = false;
 
+  if (kIsWeb) {
+    // Suppress the browser's native right-click menu so the app's own context
+    // menus (message actions, room actions, copy link, ...) are shown instead.
+    await BrowserContextMenu.disableContextMenu();
+  }
+
   MediaKit.ensureInitialized();
 
   var locale = PlatformDispatcher.instance.locale;
