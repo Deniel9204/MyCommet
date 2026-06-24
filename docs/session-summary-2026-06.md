@@ -118,6 +118,27 @@ matrix.to permalink builder, the reactor-list formatter, and the word diff.
   upstream). The only real paths are a different SDK entirely or implementing
   sliding sync in the SDK itself — both far beyond an app-side change. **#75 is
   closed as not-feasible.**
+
+  **SDK landscape (researched mid-2026):** there is no production Dart/Flutter
+  Matrix SDK with sliding sync to switch to.
+  - **No drop-in Dart SDK.** famedly `matrix` (the de-facto SDK — Commet,
+    FluffyChat, Twake) is classic `/sync` v2 only through v7.4.0. Native MSC4186
+    exists *only* as an unmerged WIP draft:
+    [famedly PR #2198](https://github.com/famedly/matrix-dart-sdk/pull/2198)
+    (opened 2025-12, explicitly WIP, ~101 lines, 0% coverage). Other "dart
+    matrix" results are dead ends (stale forks, unrelated libs, apps).
+  - **`matrix-rust-sdk` has it, but no Dart bindings.** It's the gold-standard
+    MSC4186 impl (Element X), but official UniFFI bindings target Swift/Kotlin
+    only — zero Dart wrappers. A Flutter integration would be fully DIY
+    (`uniffi-bindgen-dart`, unproven, or a hand-written `flutter_rust_bridge`
+    wrapper over the sync layer). For comparison, the `vodozemac` package this
+    app already uses wraps only the small crypto crate, not the client/sync layer.
+  - **Cost.** The Rust route is a different object model + native per-platform
+    libraries + re-implementing the fork's background/VoIP patches over FFI —
+    a multi-month effort closer to building a new client than migrating this one.
+  - **Recommended path if sliding sync becomes a hard requirement:** track (and,
+    if it matters commercially, sponsor/contribute to) famedly PR #2198, which
+    keeps the single-SDK architecture intact. Don't start an FFI bridge.
 - **Push (#1–#5)** — Android/Linux-specific, unverifiable on the web build.
 - **Calling/VoIP (#24–#29)** — needs real multi-device testing.
 - `/rainbowme` rendering and editing emotes (rest of #42) — deferred.
