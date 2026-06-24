@@ -27,6 +27,7 @@ import 'package:commet/utils/download_utils.dart';
 import 'package:commet/utils/error_utils.dart';
 import 'package:commet/utils/event_bus.dart';
 import 'package:commet/utils/matrix_permalink.dart';
+import 'package:commet/utils/redecrypt_message.dart';
 import 'package:commet/utils/text_diff.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -349,8 +350,14 @@ class TimelineEventMenu {
           name: "Decrypt all messages",
           icon: Icons.lock_reset,
           action: (context) {
+            // Capture the messenger before the async gap / menu close so the
+            // result still shows even after this menu's context is gone.
+            final messenger = ScaffoldMessenger.of(context);
             ErrorUtils.tryRun(context, () async {
-              await timeline.room.redecryptFailedEvents();
+              final count = await timeline.room.redecryptFailedEvents();
+              messenger.showSnackBar(
+                SnackBar(content: Text(redecryptResultMessage(count))),
+              );
             });
 
             onActionFinished?.call();

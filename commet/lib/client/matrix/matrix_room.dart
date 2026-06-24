@@ -727,6 +727,21 @@ class MatrixRoom extends Room {
     }
 
     final plan = planDecryptRetry(descriptors);
+    if (plan.isEmpty) return 0;
+
+    // If an unlocked key backup exists, pull all of this room's keys from it in
+    // a single request first; the SDK re-decrypts whatever it can recover. Keys
+    // the backup doesn't have fall through to the per-session to-device
+    // requests below. This is the fast path: one backup fetch instead of a
+    // to-device round-trip per session.
+    final keyManager = _matrixRoom.client.encryption?.keyManager;
+    if (keyManager != null && keyManager.enabled && await keyManager.isCached()) {
+      try {
+        await keyManager.loadAllKeysFromRoom(_matrixRoom.id);
+      } catch (e, s) {
+        Log.onError(e, s);
+      }
+    }
 
     // Request each distinct megolm session once. The SDK re-decrypts the
     // affected timeline events and fires onUpdate when the keys arrive, so the
