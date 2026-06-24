@@ -3,6 +3,7 @@ import 'package:commet_calendar_widget/calendar.dart';
 import 'package:commet_calendar_widget/calendar_view_header.dart';
 import 'package:commet_calendar_widget/event_view.dart';
 import 'package:commet_calendar_widget/main.dart';
+import 'package:commet_calendar_widget/week_start.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -39,6 +40,14 @@ class _CalendarViewWeekState extends State<CalendarViewWeek> {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
+
+    // Start the week on the day the device locale uses (e.g. Sunday in the US,
+    // Monday across much of Europe) rather than the package's hardcoded Monday
+    // (#841). The day labels are derived from the actual date below, so they
+    // follow the start day automatically.
+    final startDay = WeekDays.values[calendarViewWeekdayIndex(
+        MaterialLocalizations.of(context).firstDayOfWeekIndex)];
+
     var headerStyle = HeaderStyle(
       decoration: BoxDecoration(color: colorScheme.surfaceContainerLowest),
       leftIconConfig: IconDataConfig(color: colorScheme.onSurface),
@@ -69,6 +78,7 @@ class _CalendarViewWeekState extends State<CalendarViewWeek> {
                 child: WeekView(
                   initialDay: widget.initialDate,
                   key: key,
+                  startDay: startDay,
                   headerStyle: headerStyle,
                   heightPerMinute: heightPerMinute,
                   safeAreaOption: SafeAreaOption(
