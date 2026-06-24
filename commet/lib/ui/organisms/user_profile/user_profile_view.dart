@@ -41,6 +41,7 @@ class UserProfileView extends StatefulWidget {
       this.onSetAvatar,
       this.bio,
       this.onSetStatus,
+      this.onSetPresence,
       this.editBadges,
       this.setBio,
       this.badges = const [],
@@ -76,6 +77,7 @@ class UserProfileView extends StatefulWidget {
   final Future<void> Function()? onSetBanner;
   final Future<void> Function()? onSetAvatar;
   final Future<void> Function()? onSetStatus;
+  final Future<void> Function()? onSetPresence;
   final Future<void> Function()? onChangeName;
   final Future<void> Function()? shareCurrentTimezone;
   final Future<void> Function()? removeTimezone;
@@ -111,6 +113,18 @@ class UserProfileViewState extends State<UserProfileView> {
 
   static String get promptProfileSetStatus =>
       Intl.message("Set Status", name: "promptProfileSetStatus");
+
+  static String get promptProfileSetPresence =>
+      Intl.message("Set Presence", name: "promptProfileSetPresence");
+
+  static String get presenceLabelOnline =>
+      Intl.message("Online", name: "presenceLabelOnline");
+
+  static String get presenceLabelAway =>
+      Intl.message("Away", name: "presenceLabelAway");
+
+  static String get presenceLabelOffline =>
+      Intl.message("Appear offline", name: "presenceLabelOffline");
 
   String get promptProfileClearStatus =>
       Intl.message("Clear Status", name: "promptProfileClearStatus");
@@ -514,6 +528,11 @@ class UserProfileViewState extends State<UserProfileView> {
             text: promptProfileSetStatus,
             onPressed: () => widget.onSetStatus?.call(),
             icon: Icons.short_text),
+      if (widget.isSelf)
+        tiamat.ContextMenuItem(
+            text: promptProfileSetPresence,
+            onPressed: () => widget.onSetPresence?.call(),
+            icon: Icons.circle),
       if (widget.isSelf && widget.presence?.message != null)
         tiamat.ContextMenuItem(
             text: promptProfileClearStatus,
