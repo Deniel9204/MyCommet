@@ -185,7 +185,7 @@ class BackgroundNotificationsManager2 {
           senderImage: member.avatar,
           roomImageId: room.avatarId,
           senderImageId: member.avatarId,
-          roomImage: room.avatar,
+          roomImage: await room.getShortcutImage(),
           room: room,
           isDirectMessage: isDirectMessage);
 
