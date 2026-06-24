@@ -27,6 +27,7 @@ import 'package:commet/utils/common_strings.dart';
 import 'package:commet/utils/download_utils.dart';
 import 'package:commet/utils/error_utils.dart';
 import 'package:commet/utils/event_bus.dart';
+import 'package:commet/utils/matrix_permalink.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -62,6 +63,12 @@ class TimelineEventMenu {
         "Reply In Thread",
         desc: "Label for the menu option to reply to a message inside a thread",
         name: "promptReplyInThread",
+      );
+
+  String get promptCopyMessageLink => Intl.message(
+        "Copy link",
+        desc: "Label for the menu option to copy a matrix.to link to a message",
+        name: "promptCopyMessageLink",
       );
 
   String get promptShowSource => Intl.message(
@@ -362,6 +369,20 @@ class TimelineEventMenu {
     ];
 
     secondaryActions = [
+      TimelineEventMenuEntry(
+        name: promptCopyMessageLink,
+        icon: Icons.link,
+        action: (context) {
+          final server = serverNameFromMatrixId(timeline.room.identifier);
+          final link = buildMatrixToLink(
+            roomId: timeline.room.identifier,
+            eventId: event.eventId,
+            via: server != null ? [server] : const [],
+          );
+          Clipboard.setData(ClipboardData(text: link));
+          onActionFinished?.call();
+        },
+      ),
       if (canReplyInThread)
         TimelineEventMenuEntry(
           name: promptReplyInThread,
