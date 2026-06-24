@@ -29,6 +29,20 @@ enum TimeFormatPreference {
       };
 }
 
+/// Resolves whether time-of-day should render in 24-hour notation.
+///
+/// An explicit [preference] ([TimeFormatPreference.twelveHour] /
+/// [TimeFormatPreference.twentyFourHour]) wins and ignores the platform flag;
+/// only [TimeFormatPreference.system] defers to [systemUses24Hour] (typically
+/// `MediaQuery.of(context).alwaysUse24HourFormat`). Pure so it can be unit
+/// tested without Flutter; callers resolve [systemUses24Hour] from context.
+bool resolveUse24Hour(TimeFormatPreference preference, bool systemUses24Hour) =>
+    switch (preference) {
+      TimeFormatPreference.twelveHour => false,
+      TimeFormatPreference.twentyFourHour => true,
+      TimeFormatPreference.system => systemUses24Hour,
+    };
+
 /// Formats [time] as a localized time-of-day string.
 ///
 /// When [use24Hour] is true the result uses 24-hour notation (`HH:mm`),

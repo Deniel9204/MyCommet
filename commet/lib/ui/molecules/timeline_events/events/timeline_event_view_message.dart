@@ -338,7 +338,9 @@ class _TimelineEventViewMessageState extends State<TimelineEventViewMessage>
     if (PlatformUtils.isAndroid) {
       // I think this only works properly on android and ios, there is no documented
       // Behaviour for other platforms
-      var use24 = MediaQuery.of(context).alwaysUse24HourFormat;
+      var use24 = resolveUse24Hour(
+          TimeFormatPreference.fromStorage(preferences.timeFormat.value),
+          MediaQuery.of(context).alwaysUse24HourFormat);
 
       if (widget.detailed) {
         if (use24) {

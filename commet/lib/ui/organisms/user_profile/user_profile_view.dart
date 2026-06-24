@@ -11,6 +11,7 @@ import 'package:commet/ui/atoms/scaled_safe_area.dart';
 import 'package:commet/ui/atoms/tiny_pill.dart';
 import 'package:commet/ui/navigation/adaptive_dialog.dart';
 import 'package:commet/utils/color_utils.dart';
+import 'package:commet/utils/time_format.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -482,9 +483,11 @@ class UserProfileViewState extends State<UserProfileView> {
     final l = localTime!;
     var t = DateTime(l.year, l.month, l.day, l.hour, l.minute, l.second);
 
-    var use24 = PlatformUtils.isAndroid
-        ? MediaQuery.of(context).alwaysUse24HourFormat
-        : false;
+    var use24 = resolveUse24Hour(
+        TimeFormatPreference.fromStorage(preferences.timeFormat.value),
+        PlatformUtils.isAndroid
+            ? MediaQuery.of(context).alwaysUse24HourFormat
+            : false);
     var localDay = DateFormat(DateFormat.WEEKDAY).format(DateTime.now());
     var day = DateFormat(DateFormat.WEEKDAY).format(t);
     var time = MaterialLocalizations.of(context).formatTimeOfDay(
