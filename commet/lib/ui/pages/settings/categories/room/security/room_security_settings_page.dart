@@ -3,7 +3,6 @@ import 'package:commet/ui/navigation/adaptive_dialog.dart';
 import 'package:commet/ui/pages/get_or_create_room/room_creator.dart';
 import 'package:commet/utils/error_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:tiamat/atoms/tile.dart';
 
@@ -39,6 +38,21 @@ class _RoomSecuritySettingsPageState extends State<RoomSecuritySettingsPage> {
           name: "encryptionCannotBeDisabledExplanationRoomSettings",
           desc: "Explains that encryption cannot be disabled once enabled");
 
+  String get labelBannedUsers => Intl.message("Banned users",
+      name: "labelBannedUsers",
+      desc: "Header for the list of banned users in room settings");
+
+  String get labelUnban => Intl.message("Unban",
+      name: "labelUnban",
+      desc: "Label for the button to unban a user from a room");
+
+  Future<void> unban(String userId) async {
+    await ErrorUtils.tryRun(context, () async {
+      await widget.room.unbanUser(userId);
+    });
+    if (mounted) setState(() {});
+  }
+
   @override
   void initState() {
     isE2EEEnabled = widget.room.isE2EE;
@@ -54,7 +68,29 @@ class _RoomSecuritySettingsPageState extends State<RoomSecuritySettingsPage> {
         if (widget.room.client.supportsE2EE && widget.showEncryptionToggle)
           buildE2EEToggle(),
         buildRoomVisibility(),
+        if (widget.room.bannedUserIds.isNotEmpty) buildBannedUsers(),
       ],
+    );
+  }
+
+  Widget buildBannedUsers() {
+    return tiamat.Panel(
+      header: labelBannedUsers,
+      mode: tiamat.TileType.surfaceContainerLow,
+      child: Column(
+        children: [
+          for (final userId in widget.room.bannedUserIds)
+            ListTile(
+              dense: true,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+              title: Text(userId),
+              trailing: TextButton(
+                onPressed: () => unban(userId),
+                child: Text(labelUnban),
+              ),
+            ),
+        ],
+      ),
     );
   }
 

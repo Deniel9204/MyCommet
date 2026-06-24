@@ -862,6 +862,17 @@ class MatrixRoom extends Room {
   }
 
   @override
+  Future<void> unbanUser(String id) {
+    return matrixRoom.unban(id);
+  }
+
+  @override
+  List<String> get bannedUserIds => matrixRoom
+      .getParticipants([matrix.Membership.ban])
+      .map((e) => e.id)
+      .toList();
+
+  @override
   Future<void> kickUser(String id) {
     return matrixRoom.kick(id);
   }
