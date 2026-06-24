@@ -116,6 +116,13 @@ class MatrixClient extends Client {
   bool get supportsE2EE => true;
 
   @override
+  bool get encryptionSetupComplete {
+    final encryption = _matrixClient.encryption;
+    if (encryption == null) return true;
+    return encryption.crossSigning.enabled && encryption.keyManager.enabled;
+  }
+
+  @override
   int? get maxFileSize => config?.mUploadSize;
 
   @override

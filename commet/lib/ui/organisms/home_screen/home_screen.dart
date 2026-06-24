@@ -51,6 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
           updateRecent();
         });
       }),
+      widget.clientManager.alertManager.onAlertAdded.listen((_) {
+        if (mounted) setState(() {});
+      }),
+      widget.clientManager.alertManager.onAlertRemoved.listen((_) {
+        if (mounted) setState(() {});
+      }),
       EventBus.setFilterClient.stream.listen(setFilterClient),
     ];
 
