@@ -59,3 +59,23 @@ RelativeDay classifyRelativeDay(DateTime time, DateTime now) {
   if (days == 1) return RelativeDay.yesterday;
   return RelativeDay.older;
 }
+
+/// Formats [time] relative to [now] as a compact, locale-neutral "time ago"
+/// string for Discord-style per-message timestamps: `now`, `5m`, `2h`, `3d`,
+/// `1w`, `4mo`, `2y`. Months and years are approximate (30- and 365-day
+/// buckets), which is the norm for a relative timestamp. Timestamps in the
+/// future (e.g. from clock skew) are clamped to `now`.
+///
+/// Pure (no Flutter / locale dependency) so it can be unit tested directly.
+String formatRelativeTime(DateTime time, DateTime now) {
+  var diff = now.difference(time);
+  if (diff.isNegative) diff = Duration.zero;
+
+  if (diff.inSeconds < 60) return "now";
+  if (diff.inMinutes < 60) return "${diff.inMinutes}m";
+  if (diff.inHours < 24) return "${diff.inHours}h";
+  if (diff.inDays < 7) return "${diff.inDays}d";
+  if (diff.inDays < 30) return "${diff.inDays ~/ 7}w";
+  if (diff.inDays < 365) return "${diff.inDays ~/ 30}mo";
+  return "${diff.inDays ~/ 365}y";
+}

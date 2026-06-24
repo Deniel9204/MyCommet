@@ -140,6 +140,13 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   title: labelRelativeTimestamps,
                   description: labelRelativeTimestampsDescription,
                 ),
+                const Seperator(),
+                BooleanPreferenceToggle(
+                  preference: preferences.relativeMessageTimestamps,
+                  title: "Relative message timestamps",
+                  description:
+                      "Show each message's time as a relative duration (e.g. 5m, 2h) instead of the time of day",
+                ),
               ],
             ),
           ),

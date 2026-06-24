@@ -24,6 +24,7 @@ import 'package:commet/ui/molecules/timeline_events/timeline_event_layout.dart';
 import 'package:commet/ui/molecules/user_list.dart';
 import 'package:commet/ui/organisms/user_profile/user_profile.dart';
 import 'package:commet/utils/text_utils.dart';
+import 'package:commet/utils/time_format.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -323,6 +324,13 @@ class _TimelineEventViewMessageState extends State<TimelineEventViewMessage>
   }
 
   String timestampToString(DateTime time) {
+    // The compact relative format ("5m", "2h") only makes sense for the inline
+    // metadata timestamp; the detailed (hover/long-press) view still shows the
+    // full absolute date and time.
+    if (!widget.detailed && preferences.relativeMessageTimestamps.value) {
+      return formatRelativeTime(time, DateTime.now());
+    }
+
     if (PlatformUtils.isAndroid) {
       // I think this only works properly on android and ios, there is no documented
       // Behaviour for other platforms
