@@ -55,7 +55,8 @@ class UserProfileView extends StatefulWidget {
       this.savePreviewTheme,
       this.onMessageButtonClicked,
       this.isIgnored = false,
-      this.onToggleIgnore});
+      this.onToggleIgnore,
+      this.onRemoveAvatar});
   final ImageProvider? userAvatar;
   final ImageProvider? userBanner;
   final UserPresence? presence;
@@ -90,6 +91,7 @@ class UserProfileView extends StatefulWidget {
   final Future<void> Function()? savePreviewTheme;
   final bool isIgnored;
   final Future<void> Function()? onToggleIgnore;
+  final Future<void> Function()? onRemoveAvatar;
   final Future<void> Function(Color?)? setColorOverride;
 
   @override
@@ -500,6 +502,13 @@ class UserProfileViewState extends State<UserProfileView> {
             text: promptProfileChangeBanner,
             onPressed: () => widget.onSetBanner?.call(),
             icon: Icons.image),
+      if (widget.isSelf &&
+          widget.userAvatar != null &&
+          widget.onRemoveAvatar != null)
+        tiamat.ContextMenuItem(
+            text: "Remove avatar",
+            onPressed: () => widget.onRemoveAvatar?.call(),
+            icon: Icons.no_photography),
       if (widget.isSelf)
         tiamat.ContextMenuItem(
             text: promptProfileSetStatus,

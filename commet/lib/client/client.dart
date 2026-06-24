@@ -202,6 +202,9 @@ abstract class Client {
   /// Update the current user avatar
   Future<void> setAvatar(Uint8List bytes, String mimeType);
 
+  /// Remove the current user avatar
+  Future<void> clearAvatar();
+
   /// Set the display name of the current user
   Future<void> setDisplayName(String name);
 

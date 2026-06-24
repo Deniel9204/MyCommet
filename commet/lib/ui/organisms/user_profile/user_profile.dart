@@ -236,6 +236,7 @@ class _UserProfileState extends State<UserProfile> {
         editBadges: editBadges,
         bio: bio,
         onSetAvatar: setAvatar,
+        onRemoveAvatar: removeAvatar,
         setColorOverride: setColorOverride,
         showSource: showSource,
         onSetStatus: setStatus,
@@ -372,6 +373,13 @@ class _UserProfileState extends State<UserProfile> {
     });
 
     await widget.client.setAvatar(result, "");
+  }
+
+  Future<void> removeAvatar() async {
+    setState(() {
+      avatar = null;
+    });
+    await widget.client.clearAvatar();
   }
 
   Future<void> setStatus() async {
