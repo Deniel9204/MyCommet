@@ -155,6 +155,12 @@ class GeneralSettingsPageState extends State<GeneralSettingsPage> {
                   "Automatically focus on the message input text field when opening a chat",
             ),
             BooleanPreferenceToggle(
+              preference: preferences.spellcheckEnabled,
+              title: "Spellcheck",
+              description:
+                  "Show spell-check suggestions in the message input field",
+            ),
+            BooleanPreferenceToggle(
               preference: preferences.automaticallyOpenSpace,
               title: "Always open space",
               description:

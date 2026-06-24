@@ -449,6 +449,10 @@ class Preferences {
       defaultGetter: () => PlatformUtils.isAndroid ? false : true,
       defaultValue: false);
 
+  /// When true, the message composer shows spell-check suggestions.
+  BoolPreference spellcheckEnabled =
+      BoolPreference("spellcheck_enabled", defaultValue: true);
+
   BoolPreference automaticallyOpenSpace =
       BoolPreference("open_space_on_room_navigation", defaultValue: true);
 
