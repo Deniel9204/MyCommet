@@ -8,11 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 
-enum LODImageType {
-  blurhash,
-  thumbnail,
-  fullres,
-}
+import 'lod_image_type.dart';
+
+export 'lod_image_type.dart';
 
 class LODImageProvider extends ImageProvider<String> {
   LODImageProvider(
@@ -234,9 +232,17 @@ class LODImageCompleter extends ImageStreamCompleter {
   }
 
   Future<void> _setCodec(LODImageType type, Codec codec) async {
+    // Thumbnail and full-res are fetched concurrently and can finish in either
+    // order. Ignore any level that isn't a quality upgrade, and claim the level
+    // synchronously (before the decode await) so a thumbnail decoding in
+    // parallel sees it and bails instead of overwriting an already-loaded
+    // full-res image.
+    if (!isHigherLod(type, currentlyLoadedImage)) {
+      return;
+    }
+    currentlyLoadedImage = type;
     _codec = codec;
     await _decodeNextFrameAndSchedule();
-    currentlyLoadedImage = type;
   }
 
   Future<void> _decodeNextFrameAndSchedule() async {
