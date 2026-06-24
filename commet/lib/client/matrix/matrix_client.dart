@@ -13,6 +13,7 @@ import 'package:commet/client/matrix/components/profile/matrix_profile_component
 import 'package:commet/client/matrix/components/voip_room/matrix_voip_room_component.dart';
 import 'package:commet/client/matrix/database/matrix_database.dart';
 import 'package:commet/client/matrix/extensions/matrix_client_extensions.dart';
+import 'package:commet/client/matrix/matrix_mxc_image_provider.dart';
 import 'package:commet/client/matrix/matrix_native_implementations.dart';
 import 'package:commet/client/matrix/matrix_room_preview.dart';
 import 'package:commet/client/room_preview.dart';
@@ -747,6 +748,35 @@ class MatrixClient extends Client {
   @override
   Future<RoomPreview?> getSpacePreview(String address) async {
     return getRoomPreview(address);
+  }
+
+  @override
+  Future<PublicRoomsResult> searchPublicRooms(
+      {String? query, String? server, String? since}) async {
+    final response = await _matrixClient.queryPublicRooms(
+      server: server,
+      filter: (query != null && query.isNotEmpty)
+          ? matrix.PublicRoomQueryFilter(genericSearchTerm: query)
+          : null,
+      limit: 30,
+      since: since,
+    );
+
+    final rooms = response.chunk.map<RoomPreview>((c) {
+      return GenericRoomPreview(
+        c.roomId,
+        displayName: c.name ?? c.canonicalAlias ?? c.roomId,
+        type: RoomType.defaultRoom,
+        topic: c.topic,
+        numMembers: c.numJoinedMembers,
+        avatar: c.avatarUrl != null
+            ? MatrixMxcImage(c.avatarUrl!, _matrixClient,
+                thumbnailHeight: 64, fullResHeight: 64, autoLoadFullRes: false)
+            : null,
+      );
+    }).toList();
+
+    return PublicRoomsResult(rooms, nextBatch: response.nextBatch);
   }
 
   @override

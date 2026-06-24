@@ -78,6 +78,14 @@ class CreateRoomArgs {
   });
 }
 
+/// Result of a public-room directory query: a page of [rooms] plus the
+/// [nextBatch] pagination token for the next page, if any.
+class PublicRoomsResult {
+  final List<RoomPreview> rooms;
+  final String? nextBatch;
+  PublicRoomsResult(this.rooms, {this.nextBatch});
+}
+
 abstract class LoginResult {}
 
 class LoginResultSuccess implements LoginResult {}
@@ -198,6 +206,11 @@ abstract class Client {
 
   /// Queries the server for information about a room which this client is not a member of
   Future<RoomPreview?> getRoomPreview(String address);
+
+  /// Searches the homeserver's public room directory. [since] paginates using
+  /// the [PublicRoomsResult.nextBatch] from a previous call.
+  Future<PublicRoomsResult> searchPublicRooms(
+      {String? query, String? server, String? since});
 
   /// Update the current user avatar
   Future<void> setAvatar(Uint8List bytes, String mimeType);
