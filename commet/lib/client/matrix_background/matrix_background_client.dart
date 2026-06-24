@@ -244,6 +244,9 @@ class MatrixBackgroundClient implements Client {
   }
 
   @override
+  Future<void> clearAvatar() => throw UnimplementedError();
+
+  @override
   Future<void> setDisplayName(String name) {
     throw UnimplementedError();
   }

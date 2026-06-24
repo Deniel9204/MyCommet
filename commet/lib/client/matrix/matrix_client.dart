@@ -263,7 +263,6 @@ class MatrixClient extends Client {
         await _matrixClient.init(
           waitForFirstSync: !loadingFromCache,
           waitUntilLoadCompletedLoaded: true,
-          onMigration: () => Log.w("Matrix Database is migrating"),
         );
       });
 
@@ -632,6 +631,12 @@ class MatrixClient extends Client {
     await _updateOwnProfile();
     // TODO: Handle refresh avatar
     // await (self as MatrixPeer).refreshAvatar();
+  }
+
+  @override
+  Future<void> clearAvatar() async {
+    await _matrixClient.setAvatar(null);
+    await _updateOwnProfile();
   }
 
   @override
