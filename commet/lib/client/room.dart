@@ -240,6 +240,12 @@ abstract class Room {
 
   Future<void> banUser(String id);
 
+  /// Unban a previously banned user from this room
+  Future<void> unbanUser(String id);
+
+  /// User IDs currently banned from this room
+  List<String> get bannedUserIds => const [];
+
   Member getMemberOrFallback(String id);
 
   Member? getMember(String id);
