@@ -28,6 +28,7 @@ import 'package:commet/utils/download_utils.dart';
 import 'package:commet/utils/error_utils.dart';
 import 'package:commet/utils/event_bus.dart';
 import 'package:commet/utils/matrix_permalink.dart';
+import 'package:commet/utils/text_diff.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -94,6 +95,35 @@ class TimelineEventMenu {
     final local = time.toLocal();
     return "${ml.formatShortDate(local)} "
         "${ml.formatTimeOfDay(TimeOfDay.fromDateTime(local))}";
+  }
+
+  /// Renders the version at [index] as a diff against the next-older version,
+  /// with inserted words green and removed words struck through. The oldest
+  /// (original) version has nothing to diff against and renders plainly.
+  Widget _buildVersionText(
+      BuildContext context, List<MessageVersion> versions, int index) {
+    final body = versions[index].body;
+    if (index >= versions.length - 1) {
+      return Text(body);
+    }
+
+    final segments = diffWords(versions[index + 1].body, body);
+    final base = DefaultTextStyle.of(context).style;
+    return Text.rich(TextSpan(
+      children: [
+        for (final seg in segments)
+          TextSpan(
+            text: "${seg.text} ",
+            style: switch (seg.op) {
+              DiffOp.insert =>
+                base.copyWith(color: Colors.green, fontWeight: FontWeight.bold),
+              DiffOp.delete => base.copyWith(
+                  color: Colors.red, decoration: TextDecoration.lineThrough),
+              DiffOp.equal => base,
+            },
+          ),
+      ],
+    ));
   }
 
   String get promptShowSource => Intl.message(
@@ -464,7 +494,7 @@ class TimelineEventMenu {
                 child: ListView(
                   shrinkWrap: true,
                   children: [
-                    for (final edit in edits)
+                    for (var i = 0; i < edits.length; i++)
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 6, horizontal: 4),
@@ -472,10 +502,10 @@ class TimelineEventMenu {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _formatEditTime(context, edit.timestamp),
+                              _formatEditTime(context, edits[i].timestamp),
                               style: Theme.of(context).textTheme.labelSmall,
                             ),
-                            Text(edit.body),
+                            _buildVersionText(context, edits, i),
                           ],
                         ),
                       ),
