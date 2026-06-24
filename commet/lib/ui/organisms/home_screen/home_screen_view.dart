@@ -5,6 +5,7 @@ import 'package:commet/config/build_config.dart';
 import 'package:commet/ui/atoms/room_panel.dart';
 import 'package:commet/ui/molecules/alert_view.dart';
 import 'package:commet/ui/molecules/invitation_display.dart';
+import 'package:commet/ui/navigation/adaptive_dialog.dart';
 import 'package:commet/ui/navigation/navigation_utils.dart';
 import 'package:commet/ui/organisms/explore_rooms/explore_rooms_view.dart';
 import 'package:commet/ui/pages/get_or_create_room/get_or_create_room.dart';
@@ -175,8 +176,11 @@ class HomeScreenView extends StatelessWidget {
         pickExisting: false, showAllRoomTypes: true);
   }
 
-  void exploreRooms(BuildContext context) {
-    NavigationUtils.navigateTo(
-        context, ExploreRoomsView(client: clientManager.clients.first));
+  void exploreRooms(BuildContext context) async {
+    final client = clientManager.clients.length == 1
+        ? clientManager.clients.first
+        : await AdaptiveDialog.pickClient(context);
+    if (client == null || !context.mounted) return;
+    NavigationUtils.navigateTo(context, ExploreRoomsView(client: client));
   }
 }
