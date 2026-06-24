@@ -158,12 +158,14 @@ class TimelineEventLayoutMessage extends StatelessWidget {
         ),
       );
 
-    // Announce each message as one coherent unit to screen readers instead of
-    // a silent/jumbled pile of nested layout widgets. Interactive descendants
-    // (reactions, links, avatar) are reconciled in a follow-up; for now the
-    // message reads as a single labelled node.
+    // Give the message a single summary label for quick timeline reading,
+    // while keeping its interactive descendants (reactions, links, avatar,
+    // icon buttons) as navigable child nodes via explicitChildNodes. This
+    // replaces an earlier ExcludeSemantics that collapsed the whole message
+    // and hid those controls from screen readers.
     return Semantics(
       container: true,
+      explicitChildNodes: true,
       label: buildMessageSemanticLabel(
         senderName: senderName,
         timestamp: timestamp,
@@ -177,7 +179,7 @@ class TimelineEventLayoutMessage extends StatelessWidget {
         reactionsLabel: messageSemanticHasReactions,
         editedLabel: messageEditedMarker,
       ),
-      child: ExcludeSemantics(child: result),
+      child: result,
     );
   }
 
