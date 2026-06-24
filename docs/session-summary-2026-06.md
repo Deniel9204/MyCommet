@@ -100,11 +100,24 @@ matrix.to permalink builder, the reactor-list formatter, and the word diff.
 
 ## Known limitations / dead-ends
 
-- **Sliding sync (#75) — not buildable here.** The matrix dep is the
-  `commetchat/matrix-dart-sdk` *fork* at `upstream-v6.1.1`; that version doesn't
-  expose a sliding-sync API. Adding it means rebasing the fork onto a newer
-  famedly release and a sighted migration across ~100 files — an upstream
-  project, not an in-session change.
+- **Sliding sync (#75) — not achievable in this SDK family (investigated).**
+  The matrix dep is the `commetchat/matrix-dart-sdk` *fork* at `upstream-v6.1.1`.
+  Two findings close this out:
+  - **Upstream famedly has no sliding sync at all.** A code search across
+    `famedly/matrix-dart-sdk` returns **0** matches for `slidingSync`, including
+    in their latest release (**v7.4.0**, ~a major version ahead of the fork's
+    v6.1.1 base). Sliding sync lives in the Rust SDK / its clients, not the Dart
+    SDK — so no Dart-SDK version exposes it.
+  - **The fork carries load-bearing patches.** commetchat is **18 commits ahead**
+    of famedly v6.1.1 with patches this app depends on — "make client background
+    service ready" (the whole `MatrixBackgroundClient` / background-sync / push
+    path) and several VoIP fixes ("make remote SDP stream metadata public",
+    call-session handling).
+  Net: switching to upstream famedly would **break background service + calling**
+  (losing those patches) **and still not provide sliding sync** (it doesn't exist
+  upstream). The only real paths are a different SDK entirely or implementing
+  sliding sync in the SDK itself — both far beyond an app-side change. **#75 is
+  closed as not-feasible.**
 - **Push (#1–#5)** — Android/Linux-specific, unverifiable on the web build.
 - **Calling/VoIP (#24–#29)** — needs real multi-device testing.
 - `/rainbowme` rendering and editing emotes (rest of #42) — deferred.
@@ -135,7 +148,8 @@ matrix.to permalink builder, the reactor-list formatter, and the word diff.
    actions, and the edit-history viewer in real use.
 2. Run a full CI pass once Actions minutes reset to validate the PRs that landed
    without CI.
-3. If sliding sync matters, drive it upstream first (fork onto a newer famedly),
-   then do a sighted SDK migration.
+3. Don't pursue sliding sync against this SDK family — upstream famedly doesn't
+   implement it (see the dead-ends section). It would need a different SDK or an
+   SDK-level implementation.
 4. The safe remaining encryption piece is #12 (key export/import) — do it with
    the SDK open in front of you.
