@@ -321,6 +321,10 @@ class MatrixThreadTimeline implements Timeline {
   }
 
   @override
+  List<MessageVersion> getEditHistory(TimelineEvent event) =>
+      mainRoomTimeline.getEditHistory(event);
+
+  @override
   String getDisplayId(TimelineEvent<Client> event) {
     var e = event as MatrixTimelineEvent;
     var ev = e.event.getDisplayEvent(mainRoomTimeline.matrixTimeline!);

@@ -123,4 +123,15 @@ abstract class Timeline {
   void deleteEvent(TimelineEvent event);
 
   bool isEventRedacted(TimelineEvent event);
+
+  /// Returns all versions of [event] — the original plus every edit — newest
+  /// first. Empty if the event has not been edited.
+  List<MessageVersion> getEditHistory(TimelineEvent event);
+}
+
+/// A single version of a message: its [timestamp] and plain-text [body].
+class MessageVersion {
+  final DateTime timestamp;
+  final String body;
+  const MessageVersion(this.timestamp, this.body);
 }

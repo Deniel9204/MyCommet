@@ -83,6 +83,19 @@ class TimelineEventMenu {
         name: "promptForwardMessage",
       );
 
+  String get promptViewEdits => Intl.message(
+        "View edits",
+        desc: "Label for the menu option to view a message's edit history",
+        name: "promptViewEdits",
+      );
+
+  String _formatEditTime(BuildContext context, DateTime time) {
+    final ml = MaterialLocalizations.of(context);
+    final local = time.toLocal();
+    return "${ml.formatShortDate(local)} "
+        "${ml.formatTimeOfDay(TimeOfDay.fromDateTime(local))}";
+  }
+
   String get promptShowSource => Intl.message(
         "Show Source",
         desc: "Label for the menu option to view the JSON source of an event",
@@ -434,6 +447,42 @@ class TimelineEventMenu {
             await ErrorUtils.tryRun(context, () async {
               await target.sendMessage(message: event.plainTextBody);
             });
+            onActionFinished?.call();
+          },
+        ),
+      if (timeline.getEditHistory(event).isNotEmpty)
+        TimelineEventMenuEntry(
+          name: promptViewEdits,
+          icon: Icons.history,
+          action: (context) {
+            final edits = timeline.getEditHistory(event);
+            AdaptiveDialog.show(
+              context,
+              title: promptViewEdits,
+              builder: (context) => SizedBox(
+                width: 400,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    for (final edit in edits)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 6, horizontal: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _formatEditTime(context, edit.timestamp),
+                              style: Theme.of(context).textTheme.labelSmall,
+                            ),
+                            Text(edit.body),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
             onActionFinished?.call();
           },
         ),
