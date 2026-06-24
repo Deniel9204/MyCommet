@@ -71,6 +71,12 @@ class TimelineEventMenu {
         name: "promptCopyMessageLink",
       );
 
+  String get promptReportMessage => Intl.message(
+        "Report",
+        desc: "Label for the menu option to report a message to moderators",
+        name: "promptReportMessage",
+      );
+
   String get promptShowSource => Intl.message(
         "Show Source",
         desc: "Label for the menu option to view the JSON source of an event",
@@ -380,6 +386,21 @@ class TimelineEventMenu {
             via: server != null ? [server] : const [],
           );
           Clipboard.setData(ClipboardData(text: link));
+          onActionFinished?.call();
+        },
+      ),
+      TimelineEventMenuEntry(
+        name: promptReportMessage,
+        icon: Icons.flag,
+        action: (context) async {
+          final reason = await AdaptiveDialog.textPrompt(
+            context,
+            title: promptReportMessage,
+          );
+          if (reason == null) return;
+          await ErrorUtils.tryRun(context, () async {
+            await timeline.room.reportMessage(event.eventId, reason: reason);
+          });
           onActionFinished?.call();
         },
       ),

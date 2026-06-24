@@ -436,6 +436,10 @@ class MatrixBackgroundRoom implements Room {
   List<String> get bannedUserIds => const [];
 
   @override
+  Future<void> reportMessage(String eventId, {String? reason}) =>
+      throw UnimplementedError();
+
+  @override
   Future<void> kickUser(String id) {
     // TODO: implement kickUser
     throw UnimplementedError();

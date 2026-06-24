@@ -867,6 +867,12 @@ class MatrixRoom extends Room {
   }
 
   @override
+  Future<void> reportMessage(String eventId, {String? reason}) {
+    return matrixRoom.client
+        .reportEvent(identifier, eventId, reason: reason, score: -100);
+  }
+
+  @override
   List<String> get bannedUserIds => matrixRoom
       .getParticipants([matrix.Membership.ban])
       .map((e) => e.id)

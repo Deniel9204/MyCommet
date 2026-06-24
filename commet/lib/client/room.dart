@@ -246,6 +246,9 @@ abstract class Room {
   /// User IDs currently banned from this room
   List<String> get bannedUserIds => const [];
 
+  /// Report a message in this room to the homeserver's moderators
+  Future<void> reportMessage(String eventId, {String? reason});
+
   Member getMemberOrFallback(String id);
 
   Member? getMember(String id);
