@@ -14,7 +14,7 @@ class MatrixRoomPermissionsView extends StatefulWidget {
   final List<MatrixRoomPermissionEntry> permissions;
   final List<MatrixRoomRoleEntry> powerLevels;
   final bool canEdit;
-  final Future<void> Function(List<MatrixRoomPermissionEntry> permissions)?
+  final Future<bool> Function(List<MatrixRoomPermissionEntry> permissions)?
       setPermissions;
 
   @override
@@ -309,18 +309,30 @@ class _MatrixRoomPermissionsViewState extends State<MatrixRoomPermissionsView> {
         .cast<MatrixRoomPermissionEntry>()
         .toList();
 
-    await widget.setPermissions?.call(perms);
+    final success = await widget.setPermissions?.call(perms) ?? false;
+
+    if (!mounted) return;
 
     setState(() {
       isLoading = false;
-      isEdited = false;
 
-      // Reset power levels so they arent marked edited anymore
-      for (var entry in entries) {
-        if (entry is MatrixRoomPermissionEntry) {
-          entry.originalPowerLevel = entry.powerLevel;
+      // Only clear the edited state on success; on failure keep the pending
+      // edits (and the apply button) so the user can see it didn't take and
+      // retry, instead of the change silently appearing to have applied.
+      if (success) {
+        isEdited = false;
+        for (var entry in entries) {
+          if (entry is MatrixRoomPermissionEntry) {
+            entry.originalPowerLevel = entry.powerLevel;
+          }
         }
       }
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(success
+          ? "Permissions updated"
+          : "Failed to update permissions. You may not have permission to make this change."),
+    ));
   }
 }
