@@ -228,6 +228,31 @@ class MatrixTimeline extends Timeline {
   }
 
   @override
+  List<MessageVersion> getEditHistory(TimelineEvent event) {
+    if (event is! MatrixTimelineEvent || _matrixTimeline == null) return [];
+    final mxEvent = event.event;
+    if (!mxEvent.hasAggregatedEvents(
+        _matrixTimeline!, matrix.RelationshipTypes.edit)) {
+      return [];
+    }
+
+    // The base event keeps its original (un-edited) content.
+    final versions = <MessageVersion>[
+      MessageVersion(mxEvent.originServerTs, mxEvent.plaintextBody),
+    ];
+
+    for (final e in mxEvent.aggregatedEvents(
+        _matrixTimeline!, matrix.RelationshipTypes.edit)) {
+      final newContent = e.content.tryGetMap<String, dynamic>("m.new_content");
+      final body = newContent?.tryGet<String>("body") ?? e.plaintextBody;
+      versions.add(MessageVersion(e.originServerTs, body));
+    }
+
+    versions.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return versions;
+  }
+
+  @override
   String getDisplayId(TimelineEvent<Client> event) {
     var e = event as MatrixTimelineEvent;
     var ev = e.event.getDisplayEvent(matrixTimeline!);
