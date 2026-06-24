@@ -48,6 +48,7 @@ import 'package:commet/client/timeline_events/timeline_event_sticker.dart';
 import 'package:commet/config/build_config.dart';
 import 'package:commet/debug/log.dart';
 import 'package:commet/main.dart';
+import 'package:commet/utils/assignable_roles.dart';
 import 'package:commet/utils/image_utils.dart';
 import 'package:commet/utils/mime.dart';
 import 'package:commet/utils/room_shortcut_image.dart';
@@ -914,15 +915,24 @@ class MatrixRoom extends Room {
   }
 
   @override
-  List<Role> get availableRoles => [
-        MatrixRole(100),
-        MatrixRole(50),
-        if (getComponent<MatrixCalendarRoomComponent>()?.hasCalendar == true)
-          MatrixRole(25,
-              nameOverride: "Calendar Moderator",
-              iconOverride: Icons.calendar_month),
-        MatrixRole(0),
-      ];
+  List<Role> get availableRoles {
+    final roles = <MatrixRole>[
+      MatrixRole(100),
+      MatrixRole(50),
+      if (getComponent<MatrixCalendarRoomComponent>()?.hasCalendar == true)
+        MatrixRole(25,
+            nameOverride: "Calendar Moderator",
+            iconOverride: Icons.calendar_month),
+      MatrixRole(0),
+    ];
+
+    // You can't grant a power level higher than your own, so don't offer roles
+    // above it — picking one would just be rejected by the homeserver (#18).
+    final assignable = assignableRoleLevels(
+            roles.map((r) => r.powerLevel), _matrixRoom.ownPowerLevel)
+        .toSet();
+    return roles.where((r) => assignable.contains(r.powerLevel)).toList();
+  }
 
   @override
   Future<void> setMemberRole(String id, Role role) async {
