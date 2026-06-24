@@ -84,6 +84,7 @@ class _TimelineEventViewMessageState extends State<TimelineEventViewMessage>
 
   Widget? formattedContent;
   String? body;
+  String? plainTextBody;
   String? displayId;
   ImageProvider? senderAvatar;
   List<Attachment>? attachments;
@@ -140,6 +141,7 @@ class _TimelineEventViewMessageState extends State<TimelineEventViewMessage>
       senderAvatar: senderAvatar,
       showSender: showSender,
       formattedContent: formattedContent,
+      plainTextBody: plainTextBody,
       timestamp: timestampToString(sentTime),
       edited: edited,
       isMentioningSelf:
@@ -258,6 +260,8 @@ class _TimelineEventViewMessageState extends State<TimelineEventViewMessage>
     senderName = sender.displayName;
     senderAvatar = sender.avatar;
     senderColor = sender.defaultColor;
+
+    plainTextBody = event.plainTextBody;
 
     sentTime = event.originServerTs;
 
