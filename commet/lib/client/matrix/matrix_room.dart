@@ -249,6 +249,8 @@ class MatrixRoom extends Room {
         .where((i) => i.rooms?.join?.containsKey(_matrixRoom.id) == true)
         .listen(onRoomSyncUpdate);
 
+    // TODO: migrate onEvent -> onTimelineEvent/onHistoryEvent/onNotification
+    // ignore: deprecated_member_use
     _matrixRoom.client.onEvent.stream
         .where((event) => event.roomID == _matrixRoom.id)
         .listen(onEvent);
@@ -277,6 +279,7 @@ class MatrixRoom extends Room {
     _onUpdate.add(null);
   }
 
+  // ignore: deprecated_member_use
   void onEvent(matrix.EventUpdate eventUpdate) async {
     if (eventUpdate.roomID != identifier) {
       return;
@@ -870,6 +873,34 @@ class MatrixRoom extends Room {
   Future<void> reportMessage(String eventId, {String? reason}) {
     return matrixRoom.client
         .reportEvent(identifier, eventId, reason: reason, score: -100);
+  }
+
+  @override
+  RoomHistoryVisibility get historyVisibility {
+    final value = matrixRoom
+        .getState("m.room.history_visibility")
+        ?.content
+        .tryGet<String>("history_visibility");
+    return switch (value) {
+      "world_readable" => RoomHistoryVisibility.worldReadable,
+      "invited" => RoomHistoryVisibility.invited,
+      "joined" => RoomHistoryVisibility.joined,
+      _ => RoomHistoryVisibility.shared,
+    };
+  }
+
+  @override
+  Future<void> setHistoryVisibility(RoomHistoryVisibility visibility) {
+    final value = switch (visibility) {
+      RoomHistoryVisibility.worldReadable => "world_readable",
+      RoomHistoryVisibility.shared => "shared",
+      RoomHistoryVisibility.invited => "invited",
+      RoomHistoryVisibility.joined => "joined",
+    };
+    return matrixRoom.client
+        .setRoomStateWithKey(matrixRoom.id, "m.room.history_visibility", "", {
+      "history_visibility": value,
+    });
   }
 
   @override

@@ -62,6 +62,9 @@ class RoomVisibilityRestricted implements RoomVisibility {
 
 enum PushRule { notify, mentionsOnly, dontNotify }
 
+/// Who is able to read a room's message history.
+enum RoomHistoryVisibility { worldReadable, shared, invited, joined }
+
 /// The Room object should only be used for rooms which the user is a member of.
 /// Rooms which the user has not joined should be represented with a RoomPreview
 abstract class Room {
@@ -248,6 +251,12 @@ abstract class Room {
 
   /// Report a message in this room to the homeserver's moderators
   Future<void> reportMessage(String eventId, {String? reason});
+
+  /// Who can read this room's history
+  RoomHistoryVisibility get historyVisibility => RoomHistoryVisibility.shared;
+
+  /// Set who can read this room's history
+  Future<void> setHistoryVisibility(RoomHistoryVisibility visibility);
 
   Member getMemberOrFallback(String id);
 
