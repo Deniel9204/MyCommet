@@ -15,9 +15,11 @@ import 'package:commet/ui/navigation/adaptive_dialog.dart';
 import 'package:commet/ui/navigation/navigation_utils.dart';
 import 'package:commet/ui/pages/settings/room_settings_page.dart';
 import 'package:commet/utils/event_bus.dart';
+import 'package:commet/utils/matrix_permalink.dart';
 import 'package:commet/utils/text_utils.dart';
 import 'package:commet_calendar_widget/calendar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tiamat/atoms/context_menu.dart';
 import 'package:tiamat/tiamat.dart' as tiamat;
 
@@ -43,6 +45,18 @@ class RoomTextButton extends StatefulWidget {
           text: "Mark as Read",
           icon: Icons.visibility,
           onPressed: () => room.markAsRead()),
+      ContextMenuItem(
+          text: "Copy link",
+          icon: Icons.link,
+          onPressed: () {
+            final server = serverNameFromMatrixId(room.identifier);
+            Clipboard.setData(ClipboardData(
+              text: buildMatrixToLink(
+                roomId: room.identifier,
+                via: server != null ? [server] : const [],
+              ),
+            ));
+          }),
       if (!room.isFavorite)
         ContextMenuItem(
             text: "Set as Favorite",
