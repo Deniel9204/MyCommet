@@ -440,6 +440,13 @@ class MatrixBackgroundRoom implements Room {
       throw UnimplementedError();
 
   @override
+  RoomHistoryVisibility get historyVisibility => RoomHistoryVisibility.shared;
+
+  @override
+  Future<void> setHistoryVisibility(RoomHistoryVisibility visibility) =>
+      throw UnimplementedError();
+
+  @override
   Future<void> kickUser(String id) {
     // TODO: implement kickUser
     throw UnimplementedError();

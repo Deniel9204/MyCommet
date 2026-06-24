@@ -27,6 +27,7 @@ class RoomSecuritySettingsPage extends StatefulWidget {
 class _RoomSecuritySettingsPageState extends State<RoomSecuritySettingsPage> {
   late bool isE2EEEnabled;
   late RoomVisibility visibility;
+  late RoomHistoryVisibility historyVisibility;
 
   String get promptEnableEncryptionRoomSettings =>
       Intl.message("Enable Encryption",
@@ -57,6 +58,7 @@ class _RoomSecuritySettingsPageState extends State<RoomSecuritySettingsPage> {
   void initState() {
     isE2EEEnabled = widget.room.isE2EE;
     visibility = widget.room.visibility;
+    historyVisibility = widget.room.historyVisibility;
     super.initState();
   }
 
@@ -68,6 +70,7 @@ class _RoomSecuritySettingsPageState extends State<RoomSecuritySettingsPage> {
         if (widget.room.client.supportsE2EE && widget.showEncryptionToggle)
           buildE2EEToggle(),
         buildRoomVisibility(),
+        buildHistoryVisibility(),
         if (widget.room.bannedUserIds.isNotEmpty) buildBannedUsers(),
       ],
     );
@@ -199,6 +202,64 @@ class _RoomSecuritySettingsPageState extends State<RoomSecuritySettingsPage> {
             },
             child: RoomFieldVisibility.buildRoomVisibility(
                 widget.room.client, visibility),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String get labelHistoryVisibility => Intl.message("Who can read history",
+      name: "labelHistoryVisibility",
+      desc: "Header for the room history-visibility setting");
+
+  String historyVisibilityLabel(RoomHistoryVisibility v) {
+    switch (v) {
+      case RoomHistoryVisibility.worldReadable:
+        return "Anyone, even without joining";
+      case RoomHistoryVisibility.shared:
+        return "Members (all history)";
+      case RoomHistoryVisibility.invited:
+        return "Members (from when they were invited)";
+      case RoomHistoryVisibility.joined:
+        return "Members (from when they joined)";
+    }
+  }
+
+  Widget buildHistoryVisibility() {
+    return tiamat.Panel(
+      header: labelHistoryVisibility,
+      mode: tiamat.TileType.surfaceContainerLow,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            final picked = await AdaptiveDialog.pickOne(
+              context,
+              title: labelHistoryVisibility,
+              items: RoomHistoryVisibility.values,
+              itemBuilder: (context, item, callback) => Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: callback,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(historyVisibilityLabel(item)),
+                  ),
+                ),
+              ),
+            );
+            if (picked != null) {
+              ErrorUtils.tryRun(context, () async {
+                await widget.room.setHistoryVisibility(picked);
+                setState(() {
+                  historyVisibility = picked;
+                });
+              });
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(historyVisibilityLabel(historyVisibility)),
           ),
         ),
       ),
