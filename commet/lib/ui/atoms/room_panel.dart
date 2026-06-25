@@ -42,9 +42,13 @@ class _RoomPanelState extends State<RoomPanel> {
 
       presenceComponent
           .getUserPresence(directMessagePartner!)
-          .then((s) => setState(() {
-                presence = s;
-              }));
+          .then((s) {
+        if (mounted) {
+          setState(() {
+            presence = s;
+          });
+        }
+      });
 
       subs.add(presenceComponent.onPresenceChanged
           .where((tuple) => tuple.$1 == directMessagePartner)

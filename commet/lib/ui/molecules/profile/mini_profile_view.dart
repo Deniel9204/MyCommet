@@ -36,9 +36,13 @@ class _MiniProfileViewState extends State<MiniProfileView> {
       widget.client
           .getComponent<UserProfileComponent>()!
           .getProfile(widget.userId)
-          .then((value) => setState(() {
-                profile = value;
-              }));
+          .then((value) {
+        if (mounted) {
+          setState(() {
+            profile = value;
+          });
+        }
+      });
     } else {
       profile = widget.initialProfile;
     }
