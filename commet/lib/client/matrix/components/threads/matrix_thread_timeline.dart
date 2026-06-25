@@ -299,6 +299,19 @@ class MatrixThreadTimeline implements Timeline {
     var originalIndex =
         events.indexWhere((element) => element.eventId == event.eventId);
 
+    // A local echo keeps the same transaction id, but its event id changes from
+    // the transaction id to the real event id once the server confirms it. If
+    // the event id no longer matches, fall back to the transaction id so the
+    // message flips from "sending" to "sent" instead of being stuck as unsent.
+    if (originalIndex == -1 && event is MatrixTimelineEvent) {
+      var txnId = event.event.transactionId;
+      if (txnId != null) {
+        originalIndex = events.indexWhere((element) =>
+            element is MatrixTimelineEvent &&
+            element.event.transactionId == txnId);
+      }
+    }
+
     // Only update an event we actually have loaded. Previously, a change to a
     // thread event that wasn't in this list overwrote events[0] (the newest
     // message), silently replacing/dropping it.
