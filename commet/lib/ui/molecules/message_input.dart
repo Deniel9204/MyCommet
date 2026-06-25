@@ -30,6 +30,7 @@ import 'package:commet/client/components/gif/gif_search_result.dart';
 import 'package:commet/utils/autofill_utils.dart';
 import 'package:commet/utils/debounce.dart';
 import 'package:commet/utils/enter_key_action.dart';
+import 'package:commet/utils/mime.dart';
 import 'package:commet/utils/markdown_wrap.dart';
 import 'package:commet/utils/formatting_shortcut.dart';
 import 'package:commet/utils/event_bus.dart';
@@ -1465,7 +1466,7 @@ class MessageInputState extends State<MessageInput> {
       return;
     }
 
-    await processClipboardImageBytes(image);
+    processClipboardImageBytes(image);
   }
 
   /// Called on web when an image is pasted via the browser paste event. Only
@@ -1478,23 +1479,24 @@ class MessageInputState extends State<MessageInput> {
     processClipboardImageBytes(bytes);
   }
 
-  /// Runs raw clipboard image [bytes] through the attachment processor and adds
-  /// the result as a pending attachment. Shared by the native (pasteboard) and
+  /// Adds raw clipboard image [bytes] as a pending attachment. Pasted images
+  /// are added as-is, without the attachment processor / re-encode step; the
+  /// mime type is sniffed from the bytes. Shared by the native (pasteboard) and
   /// web (paste-event) paths.
-  Future<void> processClipboardImageBytes(Uint8List bytes) async {
-    var processedAttachment =
-        await AdaptiveDialog.show<PendingFileAttachment>(context,
-            scrollable: false,
-            builder: (context) => AttachmentProcessor(
-                  attachment:
-                      PendingFileAttachment(data: bytes, size: bytes.length),
-                ));
+  void processClipboardImageBytes(Uint8List bytes) {
+    final mimeType = Mime.lookupType("", data: bytes);
+    final extension =
+        mimeType != null ? Mime.extensionFromMime(mimeType) : null;
+    final name = extension != null ? "pasted_image.$extension" : "pasted_image";
 
-    if (processedAttachment != null) {
-      setState(() {
-        widget.addAttachment?.call(processedAttachment);
-      });
-    }
+    setState(() {
+      widget.addAttachment?.call(PendingFileAttachment(
+        name: name,
+        data: bytes,
+        size: bytes.length,
+        mimeType: mimeType,
+      ));
+    });
   }
 
   void onPopped(ScopePopped event) {
