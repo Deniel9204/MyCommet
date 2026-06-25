@@ -111,7 +111,11 @@ class MainPageViewDesktop extends StatelessWidget {
                   ],
                 ),
               ),
-              Expanded(child: mainView(context)),
+              // mainView() already returns its own flex widget (Flexible /
+              // Expanded) per branch, so it's a direct child of this Row here;
+              // wrapping it in another Expanded made two ParentDataWidgets
+              // write FlexParentData to the same render object.
+              mainView(context),
             ],
           ),
           if (state.currentRoom != null)
@@ -306,6 +310,8 @@ class MainPageViewDesktop extends StatelessWidget {
         ),
       );
 
-    return Placeholder();
+    // Keep returning a flex widget so every branch is a valid direct child of
+    // the parent Row (see mainView call site).
+    return Expanded(child: Placeholder());
   }
 }
