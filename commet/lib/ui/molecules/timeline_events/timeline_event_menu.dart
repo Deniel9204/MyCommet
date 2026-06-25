@@ -199,12 +199,14 @@ class TimelineEventMenu {
     var gifs = timeline.client.getComponent<GifComponent>();
 
     if (event.status == TimelineEventStatus.synced) {
-      canEditEvent = event is TimelineEventMessage &&
+      // Local copy so `is` promotes it (the `event` field is not promotable).
+      final editEvent = event;
+      canEditEvent = editEvent is TimelineEventMessage &&
           // Media messages (image/video/file) carry attachments; editing only
           // changes the text body, so don't offer it for them.
-          (event.attachments?.isEmpty ?? true) &&
+          (editEvent.attachments?.isEmpty ?? true) &&
           timeline.room.permissions.canUserEditMessages &&
-          event.senderId == timeline.room.client.self!.identifier &&
+          editEvent.senderId == timeline.room.client.self!.identifier &&
           setEditingEvent != null;
 
       canDeleteEvent = timeline.canDeleteEvent(event) &&
