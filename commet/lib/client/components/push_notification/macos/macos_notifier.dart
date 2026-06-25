@@ -4,9 +4,12 @@ import 'package:commet/client/components/push_notification/notification_content.
 import 'package:commet/client/components/push_notification/notification_manager.dart';
 import 'package:commet/client/components/push_notification/notifier.dart';
 import 'package:commet/client/room.dart';
+import 'package:commet/debug/log.dart';
 import 'package:commet/main.dart';
 import 'package:commet/utils/common_strings.dart';
 import 'package:commet/utils/event_bus.dart';
+import 'package:commet/utils/notification_utils.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:media_kit/media_kit.dart';
 
@@ -89,6 +92,33 @@ class MacosNotifier implements Notifier {
       InitializationSettings(macOS: initializationSettingsDarwin),
       onDidReceiveNotificationResponse: notificationResponse,
     );
+
+    if (clientManager != null) {
+      clientManager!.directMessages.highlightedRoomsList.onListUpdated
+          .listen((_) => updateBadgeCount());
+      clientManager!.onSpaceUpdated.stream.listen((_) => updateBadgeCount());
+    }
+
+    updateBadgeCount();
+  }
+
+  static const MethodChannel _dockChannel =
+      MethodChannel("chat.commet.commetapp/dock");
+
+  Future<void> _setDockBadge(int count) async {
+    try {
+      await _dockChannel.invokeMethod("setBadgeCount", count);
+    } catch (e) {
+      Log.w("Failed to set macOS dock badge: $e");
+    }
+  }
+
+  Future<void> updateBadgeCount() async {
+    if (clientManager == null) return;
+    if (preferences.showNotificationBadgesInTaskbar.value == true) {
+      var counts = NotificationUtils.getNotificationCounts();
+      await _setDockBadge(counts.$2);
+    }
   }
 
   static void notificationResponse(NotificationResponse details) {
@@ -223,8 +253,12 @@ class MacosNotifier implements Notifier {
   Future<void> clearNotifications(Room room) async {}
 
   @override
-  Future<void> enableBadges() async {}
+  Future<void> enableBadges() async {
+    await updateBadgeCount();
+  }
 
   @override
-  Future<void> disableBadges() async {}
+  Future<void> disableBadges() async {
+    await _setDockBadge(0);
+  }
 }
