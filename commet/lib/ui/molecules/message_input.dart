@@ -683,6 +683,10 @@ class MessageInputState extends State<MessageInput> {
             .isLogicalKeyPressed(LogicalKeyboardKey.arrowUp) &&
         controller.text.isEmpty) {
       widget.editLastMessage?.call();
+      // Consume the key so the editor doesn't also run its "move caret up"
+      // action on the message we just loaded, which would drop the caret to
+      // the start.
+      return KeyEventResult.handled;
     }
 
     return KeyEventResult.ignored;
