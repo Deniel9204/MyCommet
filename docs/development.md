@@ -17,7 +17,7 @@ all `flutter`/`dart` commands from there unless noted otherwise.
 
   | Platform | Requirements |
   | --- | --- |
-  | Linux | `ninja-build libgtk-3-dev libmpv-dev mpv ffmpeg` |
+  | Linux | `cmake clang ninja-build rustup libgtk-3-dev libmpv-dev mpv ffmpeg libmimalloc-dev libwebkit2gtk-4.1-dev keybinder-3.0` |
   | Android | JDK 17, Android SDK / command-line tools |
   | macOS / iOS | Xcode + Command Line Tools, [CocoaPods](https://cocoapods.org) |
   | Windows | Visual Studio (Desktop C++), and `git config --global core.longpaths true` |
