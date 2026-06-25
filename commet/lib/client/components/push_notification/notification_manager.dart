@@ -3,6 +3,7 @@ import 'package:commet/client/components/push_notification/android/android_notif
 import 'package:commet/client/components/push_notification/android/firebase_push_notifier.dart';
 import 'package:commet/client/components/push_notification/android/unified_push_notifier.dart';
 import 'package:commet/client/components/push_notification/linux/linux_notifier.dart';
+import 'package:commet/client/components/push_notification/macos/macos_notifier.dart';
 import 'package:commet/client/components/push_notification/modifiers/do_not_disturb.dart';
 import 'package:commet/client/components/push_notification/modifiers/hide_content.dart';
 import 'package:commet/client/components/push_notification/modifiers/linux_notification_formatting.dart';
@@ -67,6 +68,10 @@ class NotificationManager {
 
     if (PlatformUtils.isWindows) {
       return WindowsNotifier();
+    }
+
+    if (PlatformUtils.isMac) {
+      return MacosNotifier();
     }
 
     if (PlatformUtils.isAndroid) {
