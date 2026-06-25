@@ -185,9 +185,13 @@ class MessageInputState extends State<MessageInput> {
   }
 
   void onSetInputText(String newText) {
-    controller.text = newText;
-    controller.selection =
-        TextSelection(baseOffset: newText.length, extentOffset: newText.length);
+    // Set the text and place the caret at the end in a single atomic update.
+    // Doing it in two steps (text=, then selection=) leaves an intermediate
+    // invalid selection (-1) that can land the caret at the start instead.
+    controller.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
+    );
 
     onTextfieldUpdated(newText);
   }
