@@ -530,7 +530,9 @@ class MatrixRoom extends Room {
 
       if (id != null) {
         var event = await _matrixRoom.getEventById(id);
-        return convertEvent(event!);
+        if (event != null) {
+          return convertEvent(event);
+        }
       }
     }
 
@@ -628,7 +630,9 @@ class MatrixRoom extends Room {
     var id = await _matrixRoom.sendReaction(reactingTo.eventId, reaction.key);
     if (id != null) {
       var event = await _matrixRoom.getEventById(id);
-      return convertEvent(event!);
+      if (event != null) {
+        return convertEvent(event);
+      }
     }
 
     return null;

@@ -204,7 +204,7 @@ class _RoomTextButtonState extends State<RoomTextButton> {
             ? widget.room.displayName
             : null;
 
-    bool startsWithEmoji =
+    bool startsWithEmoji = widget.room.displayName.isNotEmpty &&
         TextUtils.isEmoji(widget.room.displayName.characters.first);
 
     if (startsWithEmoji && widget.room.avatar == null) {

@@ -221,7 +221,7 @@ class MatrixClient extends Client {
                     Alert(
                       AlertType.warning,
                       messageGetter: () =>
-                          "One of the registered accounts (${clientName.substring(0, 8)}...) was unable to load correctly, please check the logs for more details",
+                          "One of the registered accounts (${clientName.length > 8 ? clientName.substring(0, 8) : clientName}...) was unable to load correctly, please check the logs for more details",
                       titleGetter: () => "Unable to load account",
                     ),
                   );
@@ -917,6 +917,10 @@ class MatrixClient extends Client {
 
   static (MatrixLinkType, String, String)? parseMatrixLink(Uri uri) {
     if (uri.authority != "matrix.to") {
+      return null;
+    }
+
+    if (uri.fragment.length < 2) {
       return null;
     }
 
