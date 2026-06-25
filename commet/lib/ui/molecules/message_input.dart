@@ -194,6 +194,15 @@ class MessageInputState extends State<MessageInput> {
     );
 
     onTextfieldUpdated(newText);
+
+    // Editing also requests focus right after this; on some platforms (notably
+    // web) gaining focus resets the caret to the start. Re-assert it at the end
+    // once the frame settles so the caret stays where the user expects.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      controller.selection =
+          TextSelection.collapsed(offset: controller.text.length);
+    });
   }
 
   @override
