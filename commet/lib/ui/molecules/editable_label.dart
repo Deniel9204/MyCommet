@@ -35,6 +35,12 @@ class _EditableLabelState extends State<EditableLabel> {
   }
 
   @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Row(
       children: [nameEditor(), toggleNameEdit()],

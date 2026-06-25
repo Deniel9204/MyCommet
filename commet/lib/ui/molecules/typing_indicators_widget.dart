@@ -160,6 +160,12 @@ class __SingleTypingIndicatorBlobState extends State<_SingleTypingIndicatorBlob>
   }
 
   @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(1),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:commet/cache/file_provider.dart';
@@ -50,15 +51,15 @@ class _VideoPlayerImplementationState extends State<VideoPlayerImplementation> {
         seekTo: seekTo,
         getLength: getLength);
 
-    player.stream.position.listen((event) {
+    _subscriptions.add(player.stream.position.listen((event) {
       widget.controller.setProgress(event);
-    });
+    }));
 
-    player.stream.completed.listen(
+    _subscriptions.add(player.stream.completed.listen(
       (completed) {
         widget.controller.setCompleted(completed);
       },
-    );
+    ));
 
     controller = VideoController(player);
 
@@ -113,8 +114,13 @@ class _VideoPlayerImplementationState extends State<VideoPlayerImplementation> {
     }
   }
 
+  final List<StreamSubscription> _subscriptions = [];
+
   @override
   void dispose() {
+    for (final sub in _subscriptions) {
+      sub.cancel();
+    }
     player.dispose();
     super.dispose();
   }
