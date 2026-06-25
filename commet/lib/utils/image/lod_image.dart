@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:commet/debug/log.dart';
 import 'package:commet/utils/image_utils.dart';
 import 'package:commet/utils/mime.dart';
 import 'package:flutter/foundation.dart';
@@ -249,7 +250,14 @@ class LODImageCompleter extends ImageStreamCompleter {
     _nextFrame?.image.dispose();
     _nextFrame = null;
 
-    _nextFrame = await _codec!.getNextFrame();
+    try {
+      _nextFrame = await _codec!.getNextFrame();
+    } catch (e) {
+      // Some animated formats (notably APNG) can throw while decoding a frame
+      // mid-animation; stop animating instead of letting it crash the app.
+      Log.w("Failed to decode image frame: $e");
+      return;
+    }
 
     _emitFrame(ImageInfo(
       image: _nextFrame!.image.clone(),

@@ -9,17 +9,21 @@ class Mime {
   static const displayableImageTypes = {
     "image/jpeg",
     "image/png",
+    "image/apng",
     "image/gif",
     "image/bmp",
-    "image/webp"
+    "image/webp",
+    "image/avif",
   };
 
   static const imageTypes = {
     "image/jpeg",
     "image/png",
+    "image/apng",
     "image/gif",
     "image/webp",
     "image/bmp",
+    "image/avif",
   };
 
   static const gifTypes = {
@@ -57,9 +61,11 @@ class Mime {
     "jpeg": "image/jpeg",
     "jpg": "image/jpeg",
     "png": "image/png",
+    "apng": "image/apng",
     "gif": "image/gif",
     "webp": "image/webp",
-    "bmp": "image/bmp"
+    "bmp": "image/bmp",
+    "avif": "image/avif",
   };
 
   static String? fromExtenstion(String extension) {
