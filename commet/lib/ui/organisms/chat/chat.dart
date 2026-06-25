@@ -310,11 +310,13 @@ class ChatState extends State<Chat> {
           onFocusMessageInput.add(null);
           break;
         case EventInteractionType.edit:
+          // Focus first, then load the text. On web, focusing the composer
+          // resets the caret to the start, so loading the text afterwards keeps
+          // the caret at the end where the user can keep typing.
+          onFocusMessageInput.add(null);
           if (event case TimelineEventMessage m) if (timeline != null) {
             setMessageInputText.add(m.getPlaintextBody(timeline!));
           }
-
-          onFocusMessageInput.add(null);
           break;
         default:
       }
@@ -369,6 +371,13 @@ class ChatState extends State<Chat> {
   }
 
   void onInputTextUpdated(String currentText) {
+    // The body of a message being edited is not a draft; persisting it would
+    // make it reappear in the composer (with no edit in progress) after leaving
+    // and returning to the room.
+    if (interactionType == EventInteractionType.edit) {
+      return;
+    }
+
     messageDrafts.setDraft(draftKey, currentText);
 
     if (isThread) {
