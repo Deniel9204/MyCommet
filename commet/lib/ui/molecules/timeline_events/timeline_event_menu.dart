@@ -200,6 +200,9 @@ class TimelineEventMenu {
 
     if (event.status == TimelineEventStatus.synced) {
       canEditEvent = event is TimelineEventMessage &&
+          // Media messages (image/video/file) carry attachments; editing only
+          // changes the text body, so don't offer it for them.
+          (event.attachments?.isEmpty ?? true) &&
           timeline.room.permissions.canUserEditMessages &&
           event.senderId == timeline.room.client.self!.identifier &&
           setEditingEvent != null;

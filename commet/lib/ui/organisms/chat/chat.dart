@@ -359,6 +359,10 @@ class ChatState extends State<Chat> {
 
       if (!(event is TimelineEventMessage)) continue;
 
+      // Skip media messages (image/video/file) -- editing only changes the
+      // text body, not the attachment.
+      if (event.attachments?.isNotEmpty ?? false) continue;
+
       setInteractingEvent(event, type: EventInteractionType.edit);
       break;
     }
