@@ -225,7 +225,7 @@ class MatrixUrlPreviewComponent implements UrlPreviewComponent<MatrixClient> {
             Mime.videoStreamTypes.contains(videoType))) {
       var uri = Uri.parse(video);
 
-      if (uri.scheme == "https") {
+      if (uri.scheme == "https" || uri.scheme == "http") {
         videoAttachment = VideoAttachment(WebFileProvider(uri),
             width: videoWidth?.toDouble(),
             height: videoHeight?.toDouble(),

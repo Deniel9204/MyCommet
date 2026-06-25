@@ -59,7 +59,7 @@ class MatrixProfile
           }
 
           return MatrixMxcImage(
-              Uri.parse(fields[MatrixProfileComponent.bannerKey]),
+              Uri.parse(url),
               doFullres: true,
               doThumbnail: false,
               autoLoadFullRes: true,
