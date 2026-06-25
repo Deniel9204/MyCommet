@@ -60,6 +60,13 @@ class _EmojiPickerState extends State<EmojiPicker> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    controller.dispose();
+    textController.dispose();
+    super.dispose();
+  }
+
   List<Emoticon> getEmoticonList(EmoticonPack pack) {
     if (widget.onlyEmoji) {
       return pack.emoji;

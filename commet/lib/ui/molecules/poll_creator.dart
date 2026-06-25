@@ -22,6 +22,15 @@ class _PollCreatorState extends State<PollCreator> {
   String? errorMessage;
 
   @override
+  void dispose() {
+    questionController.dispose();
+    for (var option in options) {
+      option.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       child: SizedBox(

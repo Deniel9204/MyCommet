@@ -41,14 +41,15 @@ Widget wbDropdownField(BuildContext context) {
 }
 
 class DropdownTextField<T> extends StatefulWidget {
-  const DropdownTextField(
-      {required this.items,
-      this.itemHeight = 50,
-      this.onItemSelected,
-      this.initialValue,
-      this.textEditorPlaceholder = "Enter a custom input",
-      this.editableEntryPlaceholder = "Custom",
-      super.key});
+  const DropdownTextField({
+    required this.items,
+    this.itemHeight = 50,
+    this.onItemSelected,
+    this.initialValue,
+    this.textEditorPlaceholder = "Enter a custom input",
+    this.editableEntryPlaceholder = "Custom",
+    super.key,
+  });
   final List<String> items;
   final String textEditorPlaceholder;
   final String editableEntryPlaceholder;
@@ -91,6 +92,12 @@ class DropdownTextFieldState extends State<DropdownTextField> {
   }
 
   @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -98,74 +105,87 @@ class DropdownTextFieldState extends State<DropdownTextField> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
           side: BorderSide(
-              color: Theme.of(context).colorScheme.outline, width: 1.4),
+            color: Theme.of(context).colorScheme.outline,
+            width: 1.4,
+          ),
         ),
         color: Colors.transparent,
         child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-          return DropdownButtonHideUnderline(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return DropdownButtonHideUnderline(
               child: DropdownButton2(
-                  menuItemStyleData: MenuItemStyleData(
-                    height: widget.itemHeight,
+                menuItemStyleData: MenuItemStyleData(height: widget.itemHeight),
+                value: _value,
+                dropdownStyleData: DropdownStyleData(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      bottomRight: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
                   ),
-                  value: _value,
-                  dropdownStyleData: DropdownStyleData(
-                      decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                              bottomRight: Radius.circular(10),
-                              bottomLeft: Radius.circular(10)),
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHigh)),
-                  selectedItemBuilder: (context) {
-                    return _items.mapIndexed<Widget>((value, index) {
-                      if (index == _items.length - 1) {
-                        return DropdownMenuItem(
-                          alignment: Alignment.centerLeft,
-                          value: value,
-                          child: SizedBox(
-                              width: constraints.maxWidth - 60,
-                              height: widget.itemHeight,
-                              child: TextField(
-                                controller: _textEditingController,
-                                decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: widget.textEditorPlaceholder),
-                              )),
-                        );
-                      }
-                      return DropdownMenuItem(
-                        alignment: Alignment.centerLeft,
-                        value: value,
-                        child: SizedBox(
-                            width: constraints.maxWidth - 60,
-                            child: tiamat.Text.label(value)),
-                      );
-                    }).toList();
-                  },
-                  items: _items
-                      .mapIndexed<DropdownMenuItem<String>>((value, index) {
+                ),
+                selectedItemBuilder: (context) {
+                  return _items.mapIndexed<Widget>((value, index) {
                     if (index == _items.length - 1) {
                       return DropdownMenuItem(
                         alignment: Alignment.centerLeft,
                         value: value,
                         child: SizedBox(
-                            width: constraints.maxWidth - 60,
-                            child: tiamat.Text.labelLow(_customInput != ""
-                                ? _textEditingController.text
-                                : widget.editableEntryPlaceholder)),
+                          width: constraints.maxWidth - 60,
+                          height: widget.itemHeight,
+                          child: TextField(
+                            controller: _textEditingController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: widget.textEditorPlaceholder,
+                            ),
+                          ),
+                        ),
                       );
                     }
                     return DropdownMenuItem(
                       alignment: Alignment.centerLeft,
                       value: value,
                       child: SizedBox(
-                          width: constraints.maxWidth - 60,
-                          child: tiamat.Text.label(value)),
+                        width: constraints.maxWidth - 60,
+                        child: tiamat.Text.label(value),
+                      ),
                     );
-                  }).toList(),
-                  onChanged: onChanged));
-        }),
+                  }).toList();
+                },
+                items: _items.mapIndexed<DropdownMenuItem<String>>((
+                  value,
+                  index,
+                ) {
+                  if (index == _items.length - 1) {
+                    return DropdownMenuItem(
+                      alignment: Alignment.centerLeft,
+                      value: value,
+                      child: SizedBox(
+                        width: constraints.maxWidth - 60,
+                        child: tiamat.Text.labelLow(
+                          _customInput != ""
+                              ? _textEditingController.text
+                              : widget.editableEntryPlaceholder,
+                        ),
+                      ),
+                    );
+                  }
+                  return DropdownMenuItem(
+                    alignment: Alignment.centerLeft,
+                    value: value,
+                    child: SizedBox(
+                      width: constraints.maxWidth - 60,
+                      child: tiamat.Text.label(value),
+                    ),
+                  );
+                }).toList(),
+                onChanged: onChanged,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

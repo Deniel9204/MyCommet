@@ -62,6 +62,14 @@ class _GifPickerState extends State<GifPicker> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    debouce.cancel();
+    _textController.removeListener(onTextChanged);
+    _textController.dispose();
+    super.dispose();
+  }
+
   String prevText = "";
   void onTextChanged() {
     if (_textController.text == prevText) {
@@ -251,9 +259,13 @@ class _GifPickerState extends State<GifPicker> {
       sending = true;
     });
 
-    widget.gifPicked?.call(gif).then((value) => setState(() {
+    widget.gifPicked?.call(gif).then((value) {
+      if (mounted) {
+        setState(() {
           sending = false;
-        }));
+        });
+      }
+    });
   }
 
   void sendFavoriteGif(FavoriteGif gif) {
