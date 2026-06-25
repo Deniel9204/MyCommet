@@ -1454,6 +1454,12 @@ class MessageInputState extends State<MessageInput> {
   }
 
   Future<void> readImageFromClipboard() async {
+    // On web the DOM paste-event listener handles pasted images; running the
+    // pasteboard path too would add the image twice.
+    if (BuildConfig.WEB) {
+      return;
+    }
+
     var image = await Pasteboard.image;
     if (image == null) {
       return;
