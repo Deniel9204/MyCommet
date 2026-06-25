@@ -14,8 +14,6 @@ class AttachmentIcon extends StatefulWidget {
 }
 
 class _AttachmentIconState extends State<AttachmentIcon> {
-  bool hovered = false;
-
   ImageProvider? image;
 
   @override
@@ -34,12 +32,35 @@ class _AttachmentIconState extends State<AttachmentIcon> {
 
   @override
   Widget build(BuildContext context) {
-    return ImageButton(
-      size: 20,
-      image: image,
-      icon: Mime.toIcon(widget.attachment.mimeType),
-      onTap: widget.removeAttachment,
-      iconSize: 20,
+    return Stack(
+      children: [
+        ImageButton(
+          size: 20,
+          image: image,
+          icon: Mime.toIcon(widget.attachment.mimeType),
+          onTap: widget.removeAttachment,
+          iconSize: 20,
+        ),
+        // Visible "remove" affordance. The whole tile already removes on tap,
+        // so this is an ignore-pointer badge that just makes that discoverable.
+        if (widget.removeAttachment != null)
+          const Positioned(
+            top: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(1),
+                  child: Icon(Icons.close, size: 13, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
