@@ -14,11 +14,6 @@ class PlatformUtils {
     return Platform.isWindows;
   }
 
-  static bool get isMac {
-    if (kIsWeb) return false;
-    return Platform.isMacOS;
-  }
-
   static bool get isAndroid {
     if (kIsWeb) return false;
     return Platform.isAndroid;
