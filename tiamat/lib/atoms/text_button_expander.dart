@@ -8,65 +8,63 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 @UseCase(name: 'Default', type: TextButtonExpander)
 Widget wbTextButtonExpander(BuildContext context) {
   return Center(
-      child: SizedBox(
-    height: 1000,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const material.Padding(
-          padding: EdgeInsets.all(8.0),
-          child: SizedBox(
-            height: 50,
-            child: tiamat.TextButton(
-              "Test",
-              icon: Icons.tag,
+    child: SizedBox(
+      height: 1000,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const material.Padding(
+            padding: EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: 50,
+              child: tiamat.TextButton("Test", icon: Icons.tag),
             ),
           ),
-        ),
-        material.Padding(
-          padding: EdgeInsets.all(8.0),
-          child: TextButtonExpander(
-            "Test 2",
-            icon: Icons.format_list_bulleted_sharp,
-            children: ["Test", "test", "Test"]
-                .map((e) => SizedBox(
+          material.Padding(
+            padding: EdgeInsets.all(8.0),
+            child: TextButtonExpander(
+              "Test 2",
+              icon: Icons.format_list_bulleted_sharp,
+              children: ["Test", "test", "Test"]
+                  .map(
+                    (e) => SizedBox(
                       height: 40,
-                      child: tiamat.TextButton(
-                        e,
-                        icon: Icons.tag,
-                      ),
-                    ))
-                .toList(),
+                      child: tiamat.TextButton(e, icon: Icons.tag),
+                    ),
+                  )
+                  .toList(),
+            ),
           ),
-        ),
-        material.Padding(
-          padding: EdgeInsets.all(8.0),
-          child: TextButtonExpander(
-            "Test 2",
-            icon: Icons.format_list_bulleted_sharp,
-            avatarPlaceholderColor: Colors.amber.shade800,
-            avatarPlaceholderText: "A",
-            children: ["Test 1", "Test 2", "Test 3"]
-                .map((e) => TextButtonExpander(
+          material.Padding(
+            padding: EdgeInsets.all(8.0),
+            child: TextButtonExpander(
+              "Test 2",
+              icon: Icons.format_list_bulleted_sharp,
+              avatarPlaceholderColor: Colors.amber.shade800,
+              avatarPlaceholderText: "A",
+              children: ["Test 1", "Test 2", "Test 3"]
+                  .map(
+                    (e) => TextButtonExpander(
                       e,
                       initiallyExpanded: true,
                       icon: Icons.format_list_bulleted_sharp,
                       children: ["Test", "test", "Test"]
-                          .map((e) => SizedBox(
-                                height: 40,
-                                child: tiamat.TextButton(
-                                  e,
-                                  icon: Icons.tag,
-                                ),
-                              ))
+                          .map(
+                            (e) => SizedBox(
+                              height: 40,
+                              child: tiamat.TextButton(e, icon: Icons.tag),
+                            ),
+                          )
                           .toList(),
-                    ))
-                .toList(),
+                    ),
+                  )
+                  .toList(),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
-  ));
+  );
 }
 
 class TextButtonExpander extends StatelessWidget {
@@ -121,70 +119,82 @@ class TextButtonExpander extends StatelessWidget {
           enabled: enabled,
           children: children,
           childrenPadding: childrenPadding,
-          title:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            ClipRRect(
-              borderRadius: BorderRadiusGeometry.circular(8),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap:
-                      onNameTapped != null ? () => onNameTapped?.call() : null,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (icon != null || useAvatar)
-                        Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: SizedBox(
-                              width: avatarRadius * 2,
-                              height: avatarRadius * 2,
-                              child: useAvatar
-                                  ? tiamat.Avatar(
-                                      radius: avatarRadius,
-                                      image: avatar,
-                                      placeholderColor: avatarPlaceholderColor,
-                                      placeholderText: avatarPlaceholderText,
-                                    )
-                                  : Icon(
-                                      size: iconSize,
-                                      icon!,
-                                      weight: 0.5,
-                                      color: highlighted
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onSecondaryContainer
-                                          : iconColor ??
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                    ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: ClipRRect(
+                  borderRadius: BorderRadiusGeometry.circular(8),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: onNameTapped != null
+                          ? () => onNameTapped?.call()
+                          : null,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (icon != null || useAvatar)
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  width: avatarRadius * 2,
+                                  height: avatarRadius * 2,
+                                  child: useAvatar
+                                      ? tiamat.Avatar(
+                                          radius: avatarRadius,
+                                          image: avatar,
+                                          placeholderColor:
+                                              avatarPlaceholderColor,
+                                          placeholderText:
+                                              avatarPlaceholderText,
+                                        )
+                                      : Icon(
+                                          size: iconSize,
+                                          icon!,
+                                          weight: 0.5,
+                                          color: highlighted
+                                              ? Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondaryContainer
+                                              : iconColor ??
+                                                    Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface,
+                                        ),
+                                ),
+                              ),
+                            ),
+                          Flexible(
+                            child: Padding(
+                              padding: textPadding,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: tiamat.Text.labelEmphasised(
+                                  text,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  color: highlighted
+                                      ? Theme.of(
+                                          context,
+                                        ).colorScheme.onSecondaryContainer
+                                      : textColor,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      Padding(
-                        padding: textPadding,
-                        child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: tiamat.Text.labelEmphasised(
-                              text,
-                              color: highlighted
-                                  ? Theme.of(context)
-                                      .colorScheme
-                                      .onSecondaryContainer
-                                  : textColor,
-                            )),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ]),
-        )
+            ],
+          ),
+        ),
       ],
     );
   }
