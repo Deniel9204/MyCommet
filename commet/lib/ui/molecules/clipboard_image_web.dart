@@ -17,8 +17,9 @@ class WebPasteImageListener {
       final items = event.clipboardData?.items;
       if (items == null) return;
 
-      for (var i = 0; i < items.length; i++) {
-        final file = items[i].getAsFile();
+      final length = items.length ?? 0;
+      for (var i = 0; i < length; i++) {
+        final file = items[i]?.getAsFile();
         if (file == null) continue;
         if (!file.type.startsWith('image/')) continue;
 
