@@ -69,6 +69,9 @@ Help translate to your language on [Weblate](https://hosted.weblate.org/projects
 To build, you require [Flutter](https://flutter.dev), currently v3.41.9 
 
 This repo currently has a monorepo structure, containing two flutter projects: Commet and Tiamat. Commet is the main client, and Tiamat is a sort of wrapper around Material with some extra goodies, which is used to maintain a consistent style across the app. Tiamat may eventually be moved to its own repo, but for now it is maintained here for ease of development.
+
+> 📖 For a full setup guide — the pinned Flutter version (FVM), per-platform prerequisites, the Rust toolchain, and **building for macOS** — see [docs/development.md](docs/development.md). The quick steps below cover a Linux setup.
+
 ## Building
 
 ### 1. [Install Flutter](https://docs.flutter.dev/get-started/install)

@@ -2,6 +2,8 @@
 
 Thank you for your interest in contributing to Commet!
 
+> New here? See [docs/development.md](docs/development.md) for how to set up a dev environment and build the app (including macOS).
+
 We are open to most types of contributions, but for larger changes and new features, please discuss with maintainers before you begin working. This will allow us to guide you on any preferred implementation details, and ensures you don't spend your time working on something which may be moving in the wrong direction.
 
 ## Restrictions on Generative AI Usage
