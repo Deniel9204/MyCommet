@@ -36,6 +36,7 @@ class TimelineEventViewGeneric extends StatefulWidget {
 class _TimelineEventViewGenericState extends State<TimelineEventViewGeneric>
     implements TimelineEventViewWidget {
   String? text;
+  Widget? richContent;
   IconData? icon;
   ImageProvider? senderAvatar;
 
@@ -70,7 +71,7 @@ class _TimelineEventViewGenericState extends State<TimelineEventViewGeneric>
 
   @override
   Widget build(BuildContext context) {
-    if (text == null) {
+    if (text == null && richContent == null) {
       return Container();
     }
 
@@ -107,7 +108,9 @@ class _TimelineEventViewGenericState extends State<TimelineEventViewGeneric>
                       Flexible(
                         child: Row(
                           children: [
-                            Flexible(child: tiamat.Text.labelLow(text!)),
+                            Flexible(
+                                child: richContent ??
+                                    tiamat.Text.labelLow(text ?? "")),
                           ],
                         ),
                       )
@@ -146,12 +149,19 @@ class _TimelineEventViewGenericState extends State<TimelineEventViewGeneric>
 
   void loadStateFromEvent(TimelineEvent event) {
     var room = widget.room ?? widget.timeline?.room;
+    richContent = null;
 
     // "/me" actions render as "* <name> <action>" with the sender's avatar.
     if (event is TimelineEventEmote && room != null) {
       var sender = room.getMemberOrFallback(event.senderId);
-      text = "* ${sender.displayName} ${event.plainTextBody}";
       senderAvatar = sender.avatar;
+
+      // Prefer rich rendering so formatted emotes (e.g. /rainbowme) show their
+      // colours; fall back to plain text when there's no formatted body.
+      richContent = event.buildFormattedContent(timeline: widget.timeline);
+      if (richContent == null) {
+        text = "* ${sender.displayName} ${event.plainTextBody}";
+      }
       return;
     }
 
