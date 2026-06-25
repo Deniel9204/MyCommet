@@ -238,7 +238,14 @@ class MatrixClient extends Client {
 
   static Future<void> _checkSystem(ClientManager clientManager) async {
     try {
-      await vod.init(wasmPath: './assets/assets/vodozemac/');
+      // Web loads the wasm bindings from assets; native platforms must load the
+      // bundled flutter_vodozemac framework instead (otherwise the main isolate
+      // reports vodozemac missing even though E2EE is available).
+      if (BuildConfig.WEB) {
+        await vod.init(wasmPath: './assets/assets/vodozemac/');
+      } else {
+        await vodozemac.init();
+      }
       if (!vod.isInitialized()) {
         throw Exception("Vodozemac failed to initialize!");
       }
