@@ -41,7 +41,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   bool get canConfigureNotifications =>
-      PlatformUtils.isAndroid || PlatformUtils.isLinux;
+      PlatformUtils.isAndroid || PlatformUtils.isLinux || PlatformUtils.isMac;
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +111,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             description:
                 "When another device or client is active, silence notifications on this device",
           ),
-        if (PlatformUtils.isLinux || PlatformUtils.isWindows)
+        if (PlatformUtils.isLinux ||
+            PlatformUtils.isWindows ||
+            PlatformUtils.isMac)
           Column(
             children: [
               BooleanPreferenceToggle(
