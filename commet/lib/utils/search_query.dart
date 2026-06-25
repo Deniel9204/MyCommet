@@ -47,6 +47,7 @@ class SearchQuery {
     words = words
         .where((w) => ![
               typeMatch,
+              userMatch,
               hasLinkString,
               hasImageString,
               hasVideoString,

@@ -180,7 +180,7 @@ class NotificationModifierLinuxFormatting implements NotificationModifier {
 
     var uri = Uri.parse(url);
 
-    if (!(uri.scheme == "https" || uri.scheme == "https")) {
+    if (!(uri.scheme == "https" || uri.scheme == "http")) {
       return "";
     }
 

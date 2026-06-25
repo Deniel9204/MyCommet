@@ -312,10 +312,14 @@ class NotifyingList<T> implements INotifyingList<T> {
 
   @override
   void replaceRange(int start, int end, Iterable<T> replacements) {
-    _internalList.replaceRange(start, end, replacements);
+    final items = replacements.toList();
+    _internalList.replaceRange(start, end, items);
 
-    for (int i = start; i < end; i++) {
-      _onItemUpdated.add(_internalList[i]);
+    // The replacement may be a different length than the range it replaced, so
+    // notify based on the new items rather than the original [start, end) span
+    // (which could now be out of bounds).
+    for (int i = 0; i < items.length; i++) {
+      _onItemUpdated.add(_internalList[start + i]);
     }
   }
 
@@ -337,7 +341,7 @@ class NotifyingList<T> implements INotifyingList<T> {
 
   @override
   void setRange(int start, int end, Iterable<T> iterable, [int skipCount = 0]) {
-    _internalList.setRange(start, end, iterable);
+    _internalList.setRange(start, end, iterable, skipCount);
     for (int i = start; i < end; i++) {
       _onItemUpdated.add(_internalList[i]);
     }

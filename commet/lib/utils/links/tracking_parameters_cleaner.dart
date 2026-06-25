@@ -77,7 +77,7 @@ class UrlParameterRule {
       label: label,
       completeProvider: completeProvider,
       rules: data.tryGetList<String>("rules"),
-      referralMarketing: data.tryGetList<String>("rules"),
+      referralMarketing: data.tryGetList<String>("referralMarketing"),
       exceptions: data.tryGetList<String>("exceptions"),
       rawRules: data.tryGetList<String>("rawRules"),
       redirections: data.tryGetList<String>("redirections"),
