@@ -71,7 +71,9 @@ class MatrixMxcImage extends LODImageProvider {
         }
       } else {
         Log.onError(error, trace);
-        throw UnimplementedError();
+        // Surface the real failure (e.g. M_UNKNOWN fetching a thumbnail) instead
+        // of masking it as an UnimplementedError.
+        rethrow;
       }
     }
   }
