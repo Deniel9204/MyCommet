@@ -9,7 +9,6 @@ import 'package:commet/utils/common_strings.dart';
 import 'package:commet/utils/event_bus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:window_manager/window_manager.dart';
 
 /// Local (UNUserNotificationCenter) notifications for macOS.
 ///
@@ -132,12 +131,13 @@ class MacosNotifier implements Notifier {
       return;
     }
 
-    // Default tap (no action button) -> open the room.
+    // Default tap (no action button) -> open the room. macOS already brings the
+    // app to the foreground when its notification is clicked, and
+    // window_manager's show()/focus() force-unwrap a main window that isn't
+    // initialized here (which crashes), so just navigate to the room.
     final roomId = payload['room_id'];
     if (roomId != null) {
       EventBus.doOpenRoom(roomId, clientId: payload['client_id'] as String?);
-      windowManager.show();
-      windowManager.focus();
     }
   }
 
