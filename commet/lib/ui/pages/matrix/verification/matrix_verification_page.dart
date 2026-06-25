@@ -2,6 +2,7 @@ import 'package:commet/ui/pages/matrix/verification/matrix_verification_view.dar
 import 'package:flutter/widgets.dart';
 
 import 'package:matrix/encryption/utils/key_verification.dart';
+import 'package:matrix/matrix.dart';
 
 class MatrixVerificationPage extends StatefulWidget {
   final KeyVerification request;
@@ -46,11 +47,18 @@ class MatrixVerificationPageState extends State<MatrixVerificationPage> {
       onSasRejected: rejectSas,
       onVerificationRequestAccepted: acceptRequest,
       onVerificationRequestRejected: rejectRequest,
+      onContinueWithEmoji: continueWithEmoji,
     );
   }
 
   void acceptRequest() async {
     await widget.request.acceptVerification();
+  }
+
+  void continueWithEmoji() async {
+    // From the askChoice state, proceed with SAS (emoji) verification -- the
+    // universally supported method. QR would need a camera scanner UI.
+    await widget.request.continueVerification(EventTypes.Sas);
   }
 
   void rejectRequest() async {

@@ -19,11 +19,13 @@ class MatrixVerificationPageView extends StatelessWidget {
       super.key,
       this.onVerificationRequestAccepted,
       this.onVerificationRequestRejected,
+      this.onContinueWithEmoji,
       this.onSasAccepted,
       this.onSasRejected});
 
   final Function? onVerificationRequestAccepted;
   final Function? onVerificationRequestRejected;
+  final Function? onContinueWithEmoji;
   final Function? onSasAccepted;
   final Function? onSasRejected;
   final List<String> sasTypes;
@@ -66,6 +68,16 @@ class MatrixVerificationPageView extends StatelessWidget {
       desc:
           "Message to show when verification was completed successfully, and the session has been verified");
 
+  String get messageChooseVerificationMethod => Intl.message(
+      "Verify this session by comparing a sequence of emoji",
+      name: "messageChooseVerificationMethod",
+      desc:
+          "Prompt shown when the user must choose how to verify a session; the app offers emoji comparison");
+
+  String get promptStartEmojiVerification => Intl.message("Compare Emoji",
+      name: "promptStartEmojiVerification",
+      desc: "Button to begin emoji (SAS) verification");
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(height: 350, width: 500, child: determineStage(context));
@@ -73,6 +85,8 @@ class MatrixVerificationPageView extends StatelessWidget {
 
   Widget determineStage(BuildContext context) {
     switch (state) {
+      case KeyVerificationState.askChoice:
+        return promptChooseMethod(context);
       case KeyVerificationState.askAccept:
         return promptAcceptRequest(context);
       case KeyVerificationState.askSas:
@@ -91,6 +105,29 @@ class MatrixVerificationPageView extends StatelessWidget {
       default:
         return tiamat.Text.label(state.toString());
     }
+  }
+
+  Widget promptChooseMethod(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: tiamat.Text.label(messageChooseVerificationMethod),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Button.success(
+            text: promptStartEmojiVerification,
+            onTap: onContinueWithEmoji?.call,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget promptAcceptRequest(BuildContext context) {
