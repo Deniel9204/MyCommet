@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:commet/client/client.dart';
@@ -111,6 +112,8 @@ class _RoomMemberListState extends State<RoomMemberList> {
 
   int limit = 100;
 
+  StreamSubscription<void>? _roomUpdateSubscription;
+
   @override
   void initState() {
     getInitialUsers();
@@ -123,7 +126,21 @@ class _RoomMemberListState extends State<RoomMemberList> {
       loadAllUsers();
     }
 
+    // Keep the list in sync with membership changes (kicks/bans/joins) that
+    // arrive from the server, instead of only loading the members once.
+    _roomUpdateSubscription = widget.room.onUpdate.listen((_) {
+      if (!mounted) return;
+      getInitialUsers();
+      setState(() {});
+    });
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _roomUpdateSubscription?.cancel();
+    super.dispose();
   }
 
   void getInitialUsers() {
@@ -260,10 +277,10 @@ class _RoomMemberListState extends State<RoomMemberList> {
               userDisplayName: member.displayName,
               isSelf: member.identifier == widget.room.client.self!.identifier,
               child: result,
-              onUserBanned: () => roomMembers
-                  .removeWhere((i) => i.identifier == member.identifier),
-              onUserKicked: () => roomMembers
-                  .removeWhere((i) => i.identifier == member.identifier),
+              onUserBanned: () => setState(() => roomMembers
+                  .removeWhere((i) => i.identifier == member.identifier)),
+              onUserKicked: () => setState(() => roomMembers
+                  .removeWhere((i) => i.identifier == member.identifier)),
               onUserRoleChanged: () => loadAllUsers());
 
           var role = getDisplayRole(index);
