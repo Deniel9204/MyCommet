@@ -32,6 +32,7 @@ class MatrixCommandComponent extends CommandComponent<MatrixClient> {
     client.getMatrixClient().addCommand("setprofile", setProfile);
     client.getMatrixClient().addCommand("addwidget", addWidget);
     client.getMatrixClient().addCommand("rainbow", sendRainbow);
+    client.getMatrixClient().addCommand("rainbowme", sendRainbowMe);
   }
 
   @override
@@ -171,27 +172,30 @@ class MatrixCommandComponent extends CommandComponent<MatrixClient> {
     return null;
   }
 
-  FutureOr<String?> sendRainbow(
-      matrix.CommandArgs args, StringBuffer? out) async {
-    if (args.room == null) return null;
-    if (args.msg.isEmpty) return null;
-
+  String rainbowFormat(String message) {
     String formatted = "";
 
     double hue = 0;
-    var characters = args.msg.characters;
-    for (var char in args.msg.characters) {
+    var characters = message.characters;
+    for (var char in characters) {
       var color = HSVColor.fromAHSV(1.0, hue, 1.0, 1.0);
       var c = color.toColor().toHexCode();
 
       hue += 360.0 / characters.length.toDouble();
-      formatted += '<span data-mx-color=\"$c\">${char}</span>';
+      formatted += '<span data-mx-color=\"$c\">$char</span>';
     }
 
+    return formatted;
+  }
+
+  Future<String?> _sendRainbow(matrix.CommandArgs args, String msgtype) async {
+    if (args.room == null) return null;
+    if (args.msg.isEmpty) return null;
+
     final content = {
-      "msgtype": "m.text",
+      "msgtype": msgtype,
       "body": args.msg,
-      "formatted_body": formatted,
+      "formatted_body": rainbowFormat(args.msg),
       "format": "org.matrix.custom.html",
     };
 
@@ -202,4 +206,11 @@ class MatrixCommandComponent extends CommandComponent<MatrixClient> {
       txid: args.txid,
     );
   }
+
+  // "/rainbow" colours a normal message; "/rainbowme" colours an emote (/me).
+  FutureOr<String?> sendRainbow(matrix.CommandArgs args, StringBuffer? out) =>
+      _sendRainbow(args, "m.text");
+
+  FutureOr<String?> sendRainbowMe(matrix.CommandArgs args, StringBuffer? out) =>
+      _sendRainbow(args, "m.emote");
 }
