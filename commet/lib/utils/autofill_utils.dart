@@ -11,6 +11,7 @@ class AutofillUtils {
       {Room? room}) {
     List<AutofillSearchResult>? results;
 
+    if (string.isEmpty) return [];
     var firstChar = string.characters.first;
 
     string = string.substring(1);

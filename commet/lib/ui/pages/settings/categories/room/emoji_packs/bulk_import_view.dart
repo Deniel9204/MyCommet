@@ -152,7 +152,8 @@ class _EmoticonBulkImportDialogState extends State<EmoticonBulkImportDialog> {
 
     var coverId = pack.cover;
 
-    if (!pack.stickers.any((element) => element.id == pack.cover)) {
+    if (pack.stickers.isNotEmpty &&
+        !pack.stickers.any((element) => element.id == pack.cover)) {
       coverId = pack.stickers.first.id;
     }
 

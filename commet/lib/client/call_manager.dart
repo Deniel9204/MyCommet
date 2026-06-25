@@ -83,10 +83,11 @@ class CallManager {
           senderImageId: member?.avatarId,
           roomImageId: room?.avatarId,
           clientId: event.client.identifier,
-          isDirectMessage: event.client
-                  .getComponent<DirectMessagesComponent>()
-                  ?.isRoomDirectMessage(room!) ==
-              true));
+          isDirectMessage: room != null &&
+              event.client
+                      .getComponent<DirectMessagesComponent>()
+                      ?.isRoomDirectMessage(room) ==
+                  true));
     }
 
     if (event.state == VoipState.outgoing) {

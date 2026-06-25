@@ -97,7 +97,13 @@ class MatrixUploadPhotosTask implements BackgroundTaskWithIntegerProgress {
         imageData = await compute((bytes) {
           print("Decoding image");
           var decoder = img.findDecoderForData(bytes);
-          var image = decoder!.decode(bytes)!;
+          if (decoder == null) {
+            throw Exception("Unsupported or corrupted image format");
+          }
+          var image = decoder.decode(bytes);
+          if (image == null) {
+            throw Exception("Failed to decode image");
+          }
           image.exif.clear();
           print("Reencoding image");
           return img.encodeJpg(image, quality: 90);
