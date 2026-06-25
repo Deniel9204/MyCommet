@@ -88,6 +88,8 @@ class MatrixThreadTimeline implements Timeline {
         "/client/unstable/rooms/${room.identifier}/relations/$threadRootId/m.thread",
         query: {
           "limit": limit.toString(),
+          // newest-first page; we paginate backwards for older history
+          "dir": "b",
           if (nextBatch != null) "from": nextBatch
         });
 
@@ -115,6 +117,13 @@ class MatrixThreadTimeline implements Timeline {
         .map((e) =>
             room.convertEvent(e, timeline: mainRoomTimeline.matrixTimeline))
         .toList();
+
+    // The /relations chunk order isn't guaranteed to be newest-first (it varies
+    // between homeservers/endpoints), but the timeline convention here is
+    // newest-first (index 0 is the newest event, live events insert at 0).
+    // Sort so the thread isn't displayed reversed / with the newest reply
+    // stranded at the top.
+    convertedEvents.sort((a, b) => b.originServerTs.compareTo(a.originServerTs));
 
     this.nextBatch = data["next_batch"] as String?;
 
@@ -283,35 +292,41 @@ class MatrixThreadTimeline implements Timeline {
 
   void onMainTimelineEventChanged(int index) {
     var event = mainRoomTimeline.events[index];
-    if (isEventInThisThread(event)) {
-      var originalIndex =
-          events.indexWhere((element) => element.eventId == event.eventId);
-
-      var finalIndex = originalIndex;
-
-      if (finalIndex == -1) {
-        finalIndex = 0;
-      }
-
-      events[finalIndex] = event;
-      if (originalIndex != -1) {
-        onChange.add(finalIndex);
-      }
+    if (!isEventInThisThread(event)) {
+      return;
     }
+
+    var originalIndex =
+        events.indexWhere((element) => element.eventId == event.eventId);
+
+    // Only update an event we actually have loaded. Previously, a change to a
+    // thread event that wasn't in this list overwrote events[0] (the newest
+    // message), silently replacing/dropping it.
+    if (originalIndex == -1) {
+      return;
+    }
+
+    events[originalIndex] = event;
+    onChange.add(originalIndex);
   }
 
   void onMainTimelineEventRemoved(int index) {
     var event = mainRoomTimeline.events[index];
-    if (isEventInThisThread(event)) {
-      var index =
-          events.indexWhere((element) => element.eventId == event.eventId);
-
-      events.removeAt(index);
-
-      if (index != -1) {
-        onRemove.add(index);
-      }
+    if (!isEventInThisThread(event)) {
+      return;
     }
+
+    var removeIndex =
+        events.indexWhere((element) => element.eventId == event.eventId);
+
+    // Guard against -1 (event not loaded into this thread); the old code called
+    // events.removeAt(index) before checking, so removeAt(-1) would throw.
+    if (removeIndex == -1) {
+      return;
+    }
+
+    events.removeAt(removeIndex);
+    onRemove.add(removeIndex);
   }
 
   @override
