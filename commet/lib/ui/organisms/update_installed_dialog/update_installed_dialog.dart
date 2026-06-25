@@ -25,7 +25,9 @@ class _UpdateInstalledDialogState extends State<UpdateInstalledDialog> {
   @override
   void initState() {
     confetti = MessageEffectConfetti();
-    confetti?.init().then((_) => setState(() {}));
+    confetti?.init().then((_) {
+      if (mounted) setState(() {});
+    });
     super.initState();
   }
 

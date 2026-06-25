@@ -128,14 +128,17 @@ class _VoipSettingsPage extends State<VoipSettingsPage> {
     super.initState();
     sub = preferences.onSettingChanged.listen((event) => setState(() {}));
 
-    WebrtcDefaultDevices.getDevices().then((v) => setState(() {
-          Log.i(v);
-          devices = v;
+    WebrtcDefaultDevices.getDevices().then((v) {
+      if (!mounted) return;
+      setState(() {
+        Log.i(v);
+        devices = v;
 
-          microphones = v.where((i) => i.kind == "audioinput").toList();
-          speakers = v.where((i) => i.kind == "audiooutput").toList();
-          cameras = v.where((i) => i.kind == "videoinput").toList();
-        }));
+        microphones = v.where((i) => i.kind == "audioinput").toList();
+        speakers = v.where((i) => i.kind == "audiooutput").toList();
+        cameras = v.where((i) => i.kind == "videoinput").toList();
+      });
+    });
   }
 
   @override

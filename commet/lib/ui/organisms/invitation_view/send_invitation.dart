@@ -145,6 +145,7 @@ class _SendInvitationWidgetState extends State<SendInvitationWidget> {
   void doSearch(String value) async {
     var result = await widget.component.searchUsers(value);
 
+    if (!mounted) return;
     setState(() {
       isSearching = false;
       searchResults = result;
