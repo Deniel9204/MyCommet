@@ -128,6 +128,20 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 description:
                     "When receiving a message, if you have the chat selected and the app is in focus, dont show the notification",
               ),
+              if (PlatformUtils.isMac)
+                BooleanPreferenceToggle(
+                  preference: preferences.showNotificationBadgesInTaskbar,
+                  title: "Notification Badges",
+                  description:
+                      "Show a badge with the number of unread messages on the dock icon",
+                  onChanged: (enabled) {
+                    if (enabled) {
+                      NotificationManager.notifier?.enableBadges();
+                    } else {
+                      NotificationManager.notifier?.disableBadges();
+                    }
+                  },
+                ),
               if (PlatformUtils.isLinux)
                 Column(
                   children: [
