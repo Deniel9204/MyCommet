@@ -26,6 +26,25 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_macos_podfile_setup
 
+# Workaround (https://github.com/Deniel9204/MyCommet/issues/196):
+# livekit_client's `hkdf` podspec pins WebRTC-SDK 144.7559.01 while flutter_webrtc
+# pins 144.7559.04. Both are the same m144 milestone, but the exact-version
+# mismatch makes `pod install` unresolvable and breaks the macOS build. Align
+# livekit's pin to flutter_webrtc's at install time (this runs after `pub get`
+# has reset the cached checkout, so it always takes effect). Remove once upstream
+# coordinates the two plugins' WebRTC-SDK versions.
+livekit_podspec = File.join(__dir__, 'Flutter', 'ephemeral', '.symlinks',
+                            'plugins', 'livekit_client', 'macos',
+                            'livekit_client.podspec')
+if File.exist?(livekit_podspec)
+  original = File.read(livekit_podspec)
+  patched = original.gsub('144.7559.01', '144.7559.04')
+  if patched != original
+    File.write(livekit_podspec, patched)
+    puts "[commet] Aligned livekit_client WebRTC-SDK pin -> 144.7559.04 (issue #196)"
+  end
+end
+
 target 'Runner' do
   use_frameworks!
 
