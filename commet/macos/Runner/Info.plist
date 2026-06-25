@@ -28,5 +28,10 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<!-- Use the Skia backend instead of Impeller: Impeller (the macOS default on
+	     this Flutter version) does not render the bundled color emoji fonts
+	     (Twemoji COLR / Noto Color Emoji CBDT), so emoji are invisible. -->
+	<key>FLTEnableImpeller</key>
+	<false/>
 </dict>
 </plist>
