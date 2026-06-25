@@ -1060,12 +1060,15 @@ class MessageInputState extends State<MessageInput> {
               contextMenuBuilder: contextMenuBuilder,
               keyboardType: TextInputType.multiline,
               textCapitalization: TextCapitalization.sentences,
-              spellCheckConfiguration: preferences.spellcheckEnabled.value
-                  ? const SpellCheckConfiguration(
-                      misspelledTextStyle:
-                          TextField.materialMisspelledTextStyle,
-                    )
-                  : const SpellCheckConfiguration.disabled(),
+              // Native spell check only exists on Android/iOS; enabling it on
+              // web or desktop throws "no supported spell check service".
+              spellCheckConfiguration:
+                  preferences.spellcheckEnabled.value && BuildConfig.MOBILE
+                      ? const SpellCheckConfiguration(
+                          misspelledTextStyle:
+                              TextField.materialMisspelledTextStyle,
+                        )
+                      : const SpellCheckConfiguration.disabled(),
               decoration: InputDecoration(
                   contentPadding:
                       EdgeInsets.fromLTRB(8, padding / 2, 4, padding / 2),
