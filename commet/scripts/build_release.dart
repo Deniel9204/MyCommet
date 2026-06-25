@@ -62,7 +62,9 @@ Future<void> main(List<String> args) async {
     print("Detail:\t\t'$buildDetail'");
   }
 
-  var process = Process.runSync(
+  // Stream the build's output live (inheritStdio) instead of buffering it and
+  // dumping it all at the end -- a long release build otherwise looks frozen.
+  var process = await Process.start(
     "flutter",
     [
       "build",
@@ -88,9 +90,8 @@ Future<void> main(List<String> args) async {
       if (platform == "web") "--source-maps",
     ],
     runInShell: true,
+    mode: ProcessStartMode.inheritStdio,
   );
 
-  print(process.stdout);
-  print(process.stderr);
-  exit(process.exitCode);
+  exit(await process.exitCode);
 }
