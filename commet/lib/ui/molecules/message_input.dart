@@ -17,6 +17,10 @@ import 'package:commet/ui/atoms/rich_text_field.dart';
 import 'package:commet/ui/molecules/attachment_icon.dart';
 import 'package:commet/ui/molecules/overlapping_panels.dart';
 import 'package:commet/ui/molecules/poll_creator.dart';
+// On web, pasteboard can't read clipboard images; the web variant hooks the DOM
+// paste event instead. Non-web builds get the no-op stub.
+import 'package:commet/ui/molecules/clipboard_image_stub.dart'
+    if (dart.library.html) 'package:commet/ui/molecules/clipboard_image_web.dart';
 import 'package:commet/ui/organisms/attachment_processor/attachment_processor.dart';
 import 'package:commet/ui/molecules/emoticon_picker.dart';
 import 'package:commet/ui/navigation/adaptive_dialog.dart';
@@ -194,10 +198,12 @@ class MessageInputState extends State<MessageInput> {
     setInputTextSubscription?.cancel();
     preferencesSubscription?.cancel();
     onScopePopInvoked?.cancel();
+    webPasteListener.dispose();
     super.dispose();
   }
 
   StreamSubscription? preferencesSubscription;
+  late final WebPasteImageListener webPasteListener;
 
   @override
   void initState() {
@@ -212,6 +218,10 @@ class MessageInputState extends State<MessageInput> {
 
     textFocus = FocusNode(onKeyEvent: onKey);
     textFocus.addListener(onTextFocusChanged);
+
+    // On web this listens for pasted images via the DOM paste event; elsewhere
+    // it is a no-op (pasteboard handles clipboard images natively).
+    webPasteListener = WebPasteImageListener(onWebImagePasted);
 
     preferencesSubscription =
         preferences.onSettingChanged.listen((_) => setState(() {}));
@@ -593,7 +603,8 @@ class MessageInputState extends State<MessageInput> {
 
     if (HardwareKeyboard.instance
         .isLogicalKeyPressed(LogicalKeyboardKey.keyV)) {
-      if (HardwareKeyboard.instance.isControlPressed) {
+      if (HardwareKeyboard.instance.isControlPressed ||
+          HardwareKeyboard.instance.isMetaPressed) {
         readImageFromClipboard();
         return KeyEventResult.ignored;
       }
@@ -1448,12 +1459,29 @@ class MessageInputState extends State<MessageInput> {
       return;
     }
 
+    await processClipboardImageBytes(image);
+  }
+
+  /// Called on web when an image is pasted via the browser paste event. Only
+  /// the focused composer handles it, so a paste meant for another field (or a
+  /// background room's input) is ignored.
+  void onWebImagePasted(Uint8List bytes) {
+    if (!mounted || !textFocus.hasFocus) {
+      return;
+    }
+    processClipboardImageBytes(bytes);
+  }
+
+  /// Runs raw clipboard image [bytes] through the attachment processor and adds
+  /// the result as a pending attachment. Shared by the native (pasteboard) and
+  /// web (paste-event) paths.
+  Future<void> processClipboardImageBytes(Uint8List bytes) async {
     var processedAttachment =
         await AdaptiveDialog.show<PendingFileAttachment>(context,
             scrollable: false,
             builder: (context) => AttachmentProcessor(
                   attachment:
-                      PendingFileAttachment(data: image, size: image.length),
+                      PendingFileAttachment(data: bytes, size: bytes.length),
                 ));
 
     if (processedAttachment != null) {
