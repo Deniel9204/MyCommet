@@ -68,6 +68,9 @@ class MacosNotifier implements Notifier {
               replyAction,
               "Reply",
               buttonTitle: "Send",
+              // Required: the macOS plugin force-casts this (`as! String`) while
+              // building the category, so a null placeholder crashes init().
+              placeholder: "Reply",
             ),
           ],
         ),
