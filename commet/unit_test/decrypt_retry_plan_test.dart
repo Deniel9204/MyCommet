@@ -42,7 +42,8 @@ void main() {
     });
 
     test('keeps distinct senderKeys for the same session separate', () {
-      final plan = planDecryptRetry([d('a', sender: 'k1'), d('b', sender: 'k2')]);
+      final plan =
+          planDecryptRetry([d('a', sender: 'k1'), d('b', sender: 'k2')]);
       expect(plan.keysToRequest.length, 2);
     });
 

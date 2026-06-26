@@ -123,7 +123,8 @@ class MatrixThreadTimeline implements Timeline {
     // newest-first (index 0 is the newest event, live events insert at 0).
     // Sort so the thread isn't displayed reversed / with the newest reply
     // stranded at the top.
-    convertedEvents.sort((a, b) => b.originServerTs.compareTo(a.originServerTs));
+    convertedEvents
+        .sort((a, b) => b.originServerTs.compareTo(a.originServerTs));
 
     this.nextBatch = data["next_batch"] as String?;
 
