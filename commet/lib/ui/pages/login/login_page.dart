@@ -6,6 +6,7 @@ import 'package:commet/client/matrix/matrix_client.dart';
 import 'package:commet/main.dart';
 import 'package:commet/ui/pages/login/login_page_view.dart';
 import 'package:commet/utils/debounce.dart';
+import 'package:commet/utils/homeserver_input.dart';
 import 'package:commet/utils/rng.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -176,7 +177,7 @@ class LoginPageState extends State<LoginPage> {
       isServerValid = false;
     });
 
-    var uri = Uri.https(input);
+    var uri = homeserverUriFromInput(input);
     var result = await loginClient!.setHomeserver(uri);
 
     setState(() {

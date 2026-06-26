@@ -19,6 +19,9 @@ class WebPasteImageListener {
 
       final length = items.length ?? 0;
       for (var i = 0; i < length; i++) {
+        // universal_html types operator[] as non-null, but its runtime values
+        // can be null (its getters are nullable), so keep the null-aware access.
+        // ignore: invalid_null_aware_operator
         final file = items[i]?.getAsFile();
         if (file == null) continue;
         if (!file.type.startsWith('image/')) continue;
