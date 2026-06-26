@@ -117,7 +117,12 @@ class MatrixRoom extends Room {
     // (hasNewMessages compares our read receipt to the last event), but keep
     // respecting mute so muted rooms stay quiet.
     if (_matrixRoom.isUnread) return true;
-    if (_matrixRoom.pushRuleState == matrix.PushRuleState.dontNotify) {
+    // Use the cached pushRule getter, not _matrixRoom.pushRuleState: the latter
+    // scans all of the account's push rules and is expensive enough that it's
+    // deliberately cached (see _pushRule). hasUnreadMessages is called for every
+    // room on every list rebuild, so calling it uncached starves the UI thread
+    // and makes avatars/images load very slowly.
+    if (pushRule == PushRule.dontNotify) {
       return false;
     }
     return _matrixRoom.hasNewMessages;
