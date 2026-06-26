@@ -30,13 +30,17 @@ flutter_macos_podfile_setup
 # livekit_client's `hkdf` podspec pins WebRTC-SDK 144.7559.01 while flutter_webrtc
 # pins 144.7559.04. Both are the same m144 milestone, but the exact-version
 # mismatch makes `pod install` unresolvable and breaks the macOS build. Align
-# livekit's pin to flutter_webrtc's at install time (this runs after `pub get`
-# has reset the cached checkout, so it always takes effect). Remove once upstream
-# coordinates the two plugins' WebRTC-SDK versions.
-livekit_podspec = File.join(__dir__, 'Flutter', 'ephemeral', '.symlinks',
-                            'plugins', 'livekit_client', 'macos',
-                            'livekit_client.podspec')
-if File.exist?(livekit_podspec)
+# livekit's pin to flutter_webrtc's before CocoaPods resolves the dependency
+# graph. Remove once upstream coordinates the two plugins' WebRTC-SDK versions.
+def align_livekit_webrtc_pin
+  livekit_podspec = File.join(__dir__, 'Flutter', 'ephemeral', '.symlinks',
+                              'plugins', 'livekit_client', 'macos',
+                              'livekit_client.podspec')
+  unless File.exist?(livekit_podspec)
+    puts "[commet] WARNING: #{livekit_podspec} not found; skipping WebRTC-SDK pin alignment (issue #196)"
+    return
+  end
+
   original = File.read(livekit_podspec)
   patched = original.gsub('144.7559.01', '144.7559.04')
   if patched != original
@@ -49,6 +53,15 @@ target 'Runner' do
   use_frameworks!
 
   flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
+
+  # Must run AFTER flutter_install_all_macos_pods: that call is what creates the
+  # Flutter/ephemeral/.symlinks/plugins/* symlinks the patch reads. On a clean
+  # checkout (e.g. CI) the symlink doesn't exist before this point, so patching
+  # any earlier silently no-ops and `pod install` then fails to resolve
+  # WebRTC-SDK. It still runs before dependency resolution, which happens once
+  # the whole Podfile has been evaluated.
+  align_livekit_webrtc_pin
+
   target 'RunnerTests' do
     inherit! :search_paths
   end
