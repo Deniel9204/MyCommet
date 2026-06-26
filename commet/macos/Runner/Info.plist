@@ -14,6 +14,11 @@
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
+	<!-- PRODUCT_NAME is lowercase "commet" (keeps the .app bundle as commet.app
+	     so build paths don't change); display the properly-cased name in the
+	     menu bar / dock / About. -->
+	<key>CFBundleDisplayName</key>
+	<string>Commet</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
