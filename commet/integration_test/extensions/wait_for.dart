@@ -27,7 +27,7 @@ extension WaitForExtension on WidgetTester {
   /// continuously (the sync loop, spinners). This advances animations and route
   /// transitions without waiting for the tree to fully settle; pair it with a
   /// [waitFor] when the next step depends on async (network/sync) state.
-  Future<void> pumpFrames({
+  Future<void> pumpBounded({
     int frames = 12,
     Duration step = const Duration(milliseconds: 100),
   }) async {

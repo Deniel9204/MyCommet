@@ -93,7 +93,7 @@ Future<void> _confirmCreateSpace(WidgetTester tester) async {
 
   await tester.tap(confirm);
 
-  await tester.pumpFrames();
+  await tester.pumpBounded();
 }
 
 Future<void> _setSpaceName(WidgetTester tester, String spaceName) async {
@@ -111,7 +111,7 @@ Future<void> _setSpaceName(WidgetTester tester, String spaceName) async {
           .last,
       spaceName);
 
-  await tester.pumpFrames();
+  await tester.pumpBounded();
 }
 
 Future<void> _setPrivate(WidgetTester tester) async {
@@ -136,14 +136,14 @@ Future<void> _selectVisibility(WidgetTester tester, String explanation) async {
 
   // The dropdown_button2 menu opens in its own overlay route; wait for the
   // route's transition to finish so the menu items are hit-testable.
-  await tester.pumpFrames();
+  await tester.pumpBounded();
 
   await tester.waitFor(() =>
       find.widgetWithText(tiamat.Text, explanation).evaluate().isNotEmpty);
 
   await tester.tap(find.widgetWithText(tiamat.Text, explanation).last);
 
-  await tester.pumpFrames();
+  await tester.pumpBounded();
 }
 
 Future<void> _openSpaceCreator(WidgetTester tester, App app) async {
@@ -151,7 +151,7 @@ Future<void> _openSpaceCreator(WidgetTester tester, App app) async {
 
   await tester.login(app);
 
-  await tester.pumpFrames();
+  await tester.pumpBounded();
 
   // Open the "add space" menu from the side navigation bar footer. The button
   // is a tiamat.ImageButton with Icons.add inside the SpaceSelector.
@@ -162,7 +162,7 @@ Future<void> _openSpaceCreator(WidgetTester tester, App app) async {
 
   await tester.tap(find.widgetWithIcon(tiamat.ImageButton, Icons.add).last);
 
-  await tester.pumpFrames();
+  await tester.pumpBounded();
 
   // The CI integration suite runs the Linux desktop build, so GetOrCreateRoom
   // takes the desktop branch: the dialog lists the room creators on the left
@@ -179,13 +179,13 @@ Future<void> _openSpaceCreator(WidgetTester tester, App app) async {
       find.widgetWithText(tiamat.TextButton, T.current.labelRoomTypeSpace);
   if (spaceEntry.evaluate().isNotEmpty) {
     await tester.tap(spaceEntry.last);
-    await tester.pumpFrames();
+    await tester.pumpBounded();
   }
 
   final nextButton = find.widgetWithText(tiamat.Button, T.current.promptNext);
   if (nextButton.evaluate().isNotEmpty) {
     await tester.tap(nextButton.last);
-    await tester.pumpFrames();
+    await tester.pumpBounded();
   }
 
   // Wait for the creation form dialog (RoomCreatorWidget) to appear before the

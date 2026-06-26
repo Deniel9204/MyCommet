@@ -36,16 +36,16 @@ void main() {
     await _openSpaceAppearanceSettings(tester);
 
     await tester.tap(find.widgetWithIcon(tiamat.IconButton, Icons.edit));
-    await tester.pumpFrames();
+    await tester.pumpBounded();
 
     await tester.enterText(find.byType(TextField), newName);
-    await tester.pumpFrames();
+    await tester.pumpBounded();
 
     await tester.tap(find.widgetWithIcon(tiamat.IconButton, Icons.check));
-    await tester.pumpFrames();
+    await tester.pumpBounded();
 
     await tester.tap(find.byKey(DesktopSettingsPageState.backButtonKey));
-    await tester.pumpFrames();
+    await tester.pumpBounded();
 
     // The rename round-trips to the server and applies on the next sync, so
     // wait for the space's name to update before asserting.
@@ -71,7 +71,7 @@ Future<void> _selectSpace(WidgetTester tester) async {
   await tester.waitFor(() => find.byType(SpaceIcon).evaluate().isNotEmpty);
 
   await tester.tap(find.byType(SpaceIcon).first);
-  await tester.pumpFrames();
+  await tester.pumpBounded();
 }
 
 Future<void> _openSpaceSettings(WidgetTester tester) async {
@@ -85,11 +85,11 @@ Future<void> _openSpaceSettings(WidgetTester tester) async {
 
   await tester
       .tap(find.byKey(SpaceSummaryViewState.spaceSettingsButtonKey).last);
-  await tester.pumpFrames();
+  await tester.pumpBounded();
 }
 
 Future<void> _openSpaceAppearanceSettings(WidgetTester tester) async {
   await tester.tap(find.widgetWithText(
       tiamat.TextButton, T.current.labelSpaceAppearanceSettings));
-  await tester.pumpFrames();
+  await tester.pumpBounded();
 }
