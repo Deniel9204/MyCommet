@@ -3,7 +3,10 @@ import 'dart:io';
 
 String? getArg(List<String> args, String name) {
   int index = args.indexOf(name);
-  if (index == -1) return null;
+  // Not present, or present with no value after it (e.g. a CI secret expanded to
+  // an empty string, so the flag ended up last). Return null instead of
+  // indexing out of bounds.
+  if (index == -1 || index + 1 >= args.length) return null;
 
   return args[index + 1];
 }
@@ -47,9 +50,21 @@ void main(List<String> args) {
     return;
   }
 
-  String keyData = getArg(args, "--key_b64")!;
-  String keyPassword = getArg(args, "--key_password")!;
+  String? keyData = getArg(args, "--key_b64");
+  String? keyPassword = getArg(args, "--key_password");
+
+  // No release keystore configured (e.g. a fork without ANDROID_KEY_STORE_B64 /
+  // ANDROID_KEY_PASSWORD secrets). Skip writing key.properties so the build
+  // falls back to debug signing (see android/app/build.gradle) and still
+  // produces an installable, sideload-only APK. A leading "--" means the secret
+  // expanded to empty and getArg picked up the next flag.
+  if (keyData == null || keyData.isEmpty || keyData.startsWith("--")) {
+    stdout.writeln(
+        "No Android release keystore provided; skipping release signing "
+        "(the APK will be debug-signed).");
+    return;
+  }
 
   decodeAndWriteKeyFile(keyData);
-  writeKeyProperties(keyPassword);
+  writeKeyProperties(keyPassword ?? "");
 }

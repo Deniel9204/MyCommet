@@ -76,7 +76,11 @@ android {
             applicationIdSuffix ".debug"
         }
         release {
-            signingConfig signingConfigs.release
+            // Use the release keystore when one is configured (key.properties
+            // present); otherwise fall back to debug signing so CI without
+            // signing secrets still produces an installable (sideload-only) APK
+            // instead of an unsigned one.
+            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
         }
     }
 
