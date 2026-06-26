@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782477318569,
+  "lastUpdate": 1782477360225,
   "repoUrl": "https://github.com/Deniel9204/MyCommet",
   "entries": {
     "Benchmark": [
@@ -83,6 +83,90 @@ window.BENCHMARK_DATA = {
           {
             "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
             "value": 6.169,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "5380799+Deniel9204@users.noreply.github.com",
+            "name": "Akumul",
+            "username": "Deniel9204"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7692e1bb63c322a19d2207d907b672bf63155639",
+          "message": "Fix integration-test DB lifecycle and login settling (#235)\n\n* Reopen the DB isolate when its file was deleted (fix readonly DBMOVED)\n\nThe integration tests failed with SqliteException(1032) — \"attempt to write a\nreadonly database\":\n\n    [Matrix] Unable to clear database - SqliteException(1032)\n    [Matrix] Client initialization failed - SqliteException(1032)\n\nError 1032 is SQLITE_READONLY_DBMOVED: the database file was moved/deleted\nwhile a connection had it open. MultiDatabaseServer caches one DriftIsolate\nper database path and never evicts it, but the integration tests wipe the\ndatabase directory between their (sequentially-run) test files. The cached\nconnection then points at a deleted inode, so the next client init that clears\nor writes the database fails.\n\nReuse a cached connection only while its file still exists; otherwise drop the\nstale isolate and reopen against the fresh file. This was masked until now by\nthe login crash that failed the tests earlier (#232).\n\n* Don't pumpAndSettle through the login loading spinner in integration tests\n\nAfter the DB fix, login got further but failed with \"pumpAndSettle timed out\":\nthe login flow calls pumpAndSettle right after entering the homeserver and\nafter tapping login, but both show a loading spinner (homeserver lookup /\nlogging in) that animates continuously, so the frame never settles. The first\ntest then leaves a pending frame, cascading into !inTest / _pendingFrame\nbinding assertions on every later test.\n\nUse pump() at those points and rely on the existing waitFor() (which pumps a\nframe at a time and checks a condition) to advance until the login flow loads\nand the client logs in.",
+          "timestamp": "2026-06-26T14:22:52+02:00",
+          "tree_id": "177b152930b1c9838ec65f0e6bb46b3c9c8c4900",
+          "url": "https://github.com/Deniel9204/MyCommet/commit/7692e1bb63c322a19d2207d907b672bf63155639"
+        },
+        "date": 1782477359894,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Build Count",
+            "value": 505,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Body Build Count",
+            "value": 103,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Reply Body Build Count",
+            "value": 90,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Url Preview Build Count",
+            "value": 0,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Build Time",
+            "value": 1.7233235294117644,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Raster Time",
+            "value": 5.893787878787877,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Build Time",
+            "value": 3.633,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Raster Time",
+            "value": 6.748,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Build Time",
+            "value": 3.633,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Build Time",
+            "value": 3.633,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Raster Time",
+            "value": 6.748,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
+            "value": 6.503,
             "unit": "ms"
           }
         ]
