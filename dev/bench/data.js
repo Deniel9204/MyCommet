@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782496541002,
+  "lastUpdate": 1782500157225,
   "repoUrl": "https://github.com/Deniel9204/MyCommet",
   "entries": {
     "Benchmark": [
@@ -755,6 +755,90 @@ window.BENCHMARK_DATA = {
           {
             "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
             "value": 7.067,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "5380799+Deniel9204@users.noreply.github.com",
+            "name": "Akumul",
+            "username": "Deniel9204"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "070bcc6a5d4e191a9f54c8bf63de49e32c239119",
+          "message": "Build debug-signed Android APK when no release keystore is configured (#246)\n\nThe Android release jobs failed with \"RangeError ... 0..1: 2\": with no signing\nsecrets (a fork without ANDROID_KEY_STORE_B64 / ANDROID_KEY_PASSWORD), the CI\ncommand becomes `--key_password --key_b64` with no values, and\nsetup_android_release.dart indexed past the args.\n\n- setup_android_release.dart: make getArg bounds-safe, and skip writing\n  key.properties when no keystore is provided (null/empty/leading \"--\").\n- android/app/build.gradle: the release build now falls back to signingConfigs.\n  debug when key.properties is absent, so it produces an installable\n  (sideload-only) APK instead of an unsigned one. With a real keystore present\n  it still release-signs exactly as before.",
+          "timestamp": "2026-06-26T20:43:02+02:00",
+          "tree_id": "53102035622e7e9a0b698eddf4d4d3e8d94b7be3",
+          "url": "https://github.com/Deniel9204/MyCommet/commit/070bcc6a5d4e191a9f54c8bf63de49e32c239119"
+        },
+        "date": 1782500156629,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Build Count",
+            "value": 504,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Body Build Count",
+            "value": 102,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Reply Body Build Count",
+            "value": 90,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Url Preview Build Count",
+            "value": 0,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Build Time",
+            "value": 1.451942857142857,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Raster Time",
+            "value": 5.432818181818182,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Build Time",
+            "value": 3.034,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Raster Time",
+            "value": 7.234,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Build Time",
+            "value": 3.034,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Build Time",
+            "value": 3.034,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Raster Time",
+            "value": 7.234,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
+            "value": 6.122,
             "unit": "ms"
           }
         ]
