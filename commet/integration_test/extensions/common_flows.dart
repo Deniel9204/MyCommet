@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:commet/config/app_config.dart';
-import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar.dart';
+import 'package:commet/ui/molecules/user_panel_settings.dart';
 import 'package:commet/ui/pages/login/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -150,15 +150,20 @@ extension CommonFlows on WidgetTester {
   }
 
   Future<void> openSettings(App app) async {
-    // login()'s final waitFor uses skipPumpAndSettle, so on return the app may
-    // still be swapping LoginPage -> MainPage and the side nav isn't in the tree
-    // yet. Wait for it before dragging within it.
-    await waitFor(() => find.byType(SideNavigationBar).evaluate().isNotEmpty);
+    // The app-settings button lives in the user panel (CurrentSessionPanel ->
+    // UserPanelSettings): an Icons.settings IconButton that opens
+    // AppSettingsPage. It's always visible on the desktop main page, so no
+    // dragging is needed. login()'s final waitFor uses skipPumpAndSettle, so on
+    // return the app may still be swapping LoginPage -> MainPage; wait for the
+    // panel to render first.
+    final settingsButton = find.descendant(
+      of: find.byType(UserPanelSettings),
+      matching: find.widgetWithIcon(tiamat.IconButton, Icons.settings),
+    );
 
-    await dragUntilVisible(find.byKey(SideNavigationBar.settingsKey),
-        find.byType(SideNavigationBar), const Offset(0, 20));
+    await waitFor(() => settingsButton.evaluate().isNotEmpty);
 
-    await tap(find.byKey(SideNavigationBar.settingsKey));
+    await tap(settingsButton);
 
     // The settings page opens over the live app, which never fully settles;
     // pump a bounded number of frames and let callers waitFor what they need.
