@@ -198,7 +198,7 @@ class MatrixVoipComponent
   Future<void> stopRingtone() async {}
 
   @override
-  Future<void> startCall(String roomId, CallType type, {String? userId}) {
+  Future<void> startCall(String roomId, CallType type, {String? userId}) async {
     WebrtcDefaultDevices.selectOutputDevice();
 
     var callType = switch (type) {
@@ -207,7 +207,18 @@ class MatrixVoipComponent
     };
 
     var room = client.getMatrixClient().getRoomById(roomId);
-    return voip.inviteToCall(room!, callType, userId: userId);
+    if (room == null) return;
+
+    try {
+      await voip.inviteToCall(room, callType, userId: userId);
+    } catch (e, s) {
+      // Call setup can fail (e.g. the user declines the no-TURN fallback, so
+      // createPeerConnection throws "No Turn servers are configured"). This is
+      // invoked fire-and-forget from the UI, so an uncaught rejection becomes
+      // an unhandled async error and takes the app down on desktop. Surface it
+      // instead of crashing.
+      Log.onError(e, s, content: "Failed to start call");
+    }
   }
 
   @override
