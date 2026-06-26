@@ -7,46 +7,55 @@ class MatrixRoomPermissions extends Permissions {
 
   MatrixRoomPermissions(this.room);
 
-  @override
-  bool get canBan => room.canBan;
+  // The matrix SDK's power-level checks (`ownPowerLevel`) do `client.userID!`
+  // and throw when there is no logged-in user — e.g. a client that isn't logged
+  // in, like the timeline render benchmark. An unidentified user has no
+  // permissions, so treat "no user" as "not allowed" rather than crashing.
+  bool get _loggedIn => room.client.userID != null;
 
   @override
-  bool get canKick => room.canKick;
+  bool get canBan => _loggedIn && room.canBan;
 
   @override
-  bool get canSendMessage => room.canSendDefaultMessages;
+  bool get canKick => _loggedIn && room.canKick;
 
   @override
-  bool get canEditAvatar => room.canChangeStateEvent("m.room.avatar");
+  bool get canSendMessage => _loggedIn && room.canSendDefaultMessages;
 
   @override
-  bool get canEditName => room.canChangeStateEvent("m.room.name");
+  bool get canEditAvatar =>
+      _loggedIn && room.canChangeStateEvent("m.room.avatar");
+
+  @override
+  bool get canEditName => _loggedIn && room.canChangeStateEvent("m.room.name");
 
   @override
   bool get canEditTopic =>
-      room.canChangeStateEvent(matrix.EventTypes.RoomTopic);
+      _loggedIn && room.canChangeStateEvent(matrix.EventTypes.RoomTopic);
 
   @override
-  bool get canEnableE2EE => room.canChangeStateEvent("m.room.encryption");
+  bool get canEnableE2EE =>
+      _loggedIn && room.canChangeStateEvent("m.room.encryption");
 
   @override
-  bool get canEditRoomEmoticons => room.canSendDefaultStates;
+  bool get canEditRoomEmoticons => _loggedIn && room.canSendDefaultStates;
 
   @override
-  bool get canDeleteOtherUserMessages => room.canRedact;
+  bool get canDeleteOtherUserMessages => _loggedIn && room.canRedact;
 
   @override
   bool get canEditChildren =>
-      room.canChangeStateEvent(matrix.EventTypes.SpaceChild);
+      _loggedIn && room.canChangeStateEvent(matrix.EventTypes.SpaceChild);
 
   @override
-  bool get canInviteUser => room.canInvite;
+  bool get canInviteUser => _loggedIn && room.canInvite;
 
   @override
-  bool get canChangeRoles => room.canChangePowerLevel;
+  bool get canChangeRoles => _loggedIn && room.canChangePowerLevel;
 
   @override
-  bool get canMentionRoom => canUserMentionRoom(room.client.userID!, room);
+  bool get canMentionRoom =>
+      _loggedIn && canUserMentionRoom(room.client.userID!, room);
 
   static bool canUserMentionRoom(String user, matrix.Room room) {
     int powerLevel = 50;
@@ -67,5 +76,5 @@ class MatrixRoomPermissions extends Permissions {
 
   @override
   bool get canChangeVisibility =>
-      room.canChangeStateEvent(matrix.EventTypes.RoomJoinRules);
+      _loggedIn && room.canChangeStateEvent(matrix.EventTypes.RoomJoinRules);
 }
