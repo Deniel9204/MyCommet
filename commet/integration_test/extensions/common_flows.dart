@@ -155,6 +155,8 @@ extension CommonFlows on WidgetTester {
 
     await tap(find.byKey(SideNavigationBar.settingsKey));
 
-    await pumpAndSettle();
+    // The settings page opens over the live app, which never fully settles;
+    // pump a bounded number of frames and let callers waitFor what they need.
+    await pumpFrames();
   }
 }

@@ -13,6 +13,9 @@ jobs:
   integration-test:
     name: Integration Test
     runs-on: ubuntu-latest
+    # A hanging widget test (e.g. pumpAndSettle never settling) would otherwise
+    # run until GitHub's 6h default; fail fast instead.
+    timeout-minutes: 30
     steps:
       - name: Checkout  ┏━┓ ︵ /(^.^/)
         uses: actions/checkout@v2
@@ -63,7 +66,9 @@ jobs:
           scripts/integration-test.sh 2>&1 | tee test_output.txt
           INTEGRATION_TEST_EXIT_CODE=${PIPESTATUS[0]}
           sleep 1
-          kill $(pgrep ffmpeg)
+          # ffmpeg may have already exited, leaving pgrep empty; don't let the
+          # cleanup kill fail the step after a passing run.
+          pkill -x ffmpeg || true
           exit $INTEGRATION_TEST_EXIT_CODE
 
       - name: Upload Artifact

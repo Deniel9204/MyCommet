@@ -41,7 +41,9 @@ void main() {
 
     await tester.loginUser2(app);
 
-    await tester.pumpAndSettle();
+    // The second client is registered once its login completes; wait for it
+    // rather than settling (the live app never fully settles).
+    await tester.waitFor(() => app.clientManager.clients.length == 2);
 
     expect(app.clientManager.clients.length, equals(2));
     expect(
