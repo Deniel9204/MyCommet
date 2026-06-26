@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782484001419,
+  "lastUpdate": 1782487219850,
   "repoUrl": "https://github.com/Deniel9204/MyCommet",
   "entries": {
     "Benchmark": [
@@ -335,6 +335,90 @@ window.BENCHMARK_DATA = {
           {
             "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
             "value": 5.857,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "5380799+Deniel9204@users.noreply.github.com",
+            "name": "Akumul",
+            "username": "Deniel9204"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9d955d43b13d6a89b9ced90698ba78f642f6408c",
+          "message": "Fix macOS crash on call start: add microphone/camera permission (#241)\n\nThe macOS app crashed (SIGABRT, TCC privacy violation) the moment a voice or\nvideo call started — the .ips report shows __TCC_CRASHING_DUE_TO_PRIVACY_VIOLATION__\nbecause WebRTC requests the microphone but Info.plist had no usage description.\nThis was unconditional: it had nothing to do with TURN/the call-error dialog;\nany call crashes because mic access happens during call setup.\n\n- Add NSMicrophoneUsageDescription and NSCameraUsageDescription to Info.plist\n  (macOS hard-kills the app without these).\n- Add com.apple.security.device.audio-input and .device.camera entitlements to\n  the Release and DebugProfile entitlements (the app is sandboxed, so WebRTC\n  can't open the mic/camera without them).",
+          "timestamp": "2026-06-26T17:07:38+02:00",
+          "tree_id": "23a536a8d5e45f2a5998ab13d210d1187580715d",
+          "url": "https://github.com/Deniel9204/MyCommet/commit/9d955d43b13d6a89b9ced90698ba78f642f6408c"
+        },
+        "date": 1782487218946,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Build Count",
+            "value": 505,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Body Build Count",
+            "value": 103,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Reply Body Build Count",
+            "value": 90,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Url Preview Build Count",
+            "value": 0,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Build Time",
+            "value": 1.5459411764705884,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Raster Time",
+            "value": 5.763062499999999,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Build Time",
+            "value": 3.557,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Raster Time",
+            "value": 8.043,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Build Time",
+            "value": 3.557,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Build Time",
+            "value": 3.557,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Raster Time",
+            "value": 8.043,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
+            "value": 6.491,
             "unit": "ms"
           }
         ]
