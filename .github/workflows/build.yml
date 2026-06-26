@@ -231,3 +231,39 @@ jobs:
         run: |
           cd $PROJECT_PATH
           flutter build web --release --dart-define PLATFORM=web
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.8.0
+        with:
+          flutter-version: '3.41.9'
+          channel: 'stable'
+
+      - name: Configure Flutter
+        run: flutter config --enable-macos-desktop
+
+      - name: Code Generation
+        run: |
+          cd $PROJECT_PATH
+          dart run scripts/codegen.dart
+
+      # macOS-specific build wiring (entitlements, the livekit/WebRTC-SDK Podfile
+      # patch, native vodozemac init, emoji font fallback, Impeller off) is all
+      # committed in the repo and applied automatically by `flutter build macos`
+      # (which runs `pod install`). The app is ad-hoc signed ("-"), so no Apple
+      # signing secrets are required.
+      - name: Build macOS App
+        run: |
+          cd $PROJECT_PATH
+          flutter build macos --release --dart-define PLATFORM=macos
+
+      - name: Verify build output
+        run: |
+          file $PROJECT_PATH/build/macos/Build/Products/Release/commet.app/Contents/MacOS/commet
