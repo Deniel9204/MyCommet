@@ -75,6 +75,18 @@ class MatrixRoom extends Room {
 
   final StreamController<void> _onUpdate = StreamController.broadcast();
 
+  // Cached unread state. hasUnreadMessages is read for every room on every list
+  // rebuild (scroll, hover, etc.), and computing it touches pushRule + the SDK's
+  // hasNewMessages (lastEvent + receipts), which is expensive enough to stall
+  // avatar/image loading. Compute it once and reuse until the room signals an
+  // update via _notifyUpdate (sync, new event, notification, ...).
+  bool? _cachedHasUnread;
+
+  void _notifyUpdate() {
+    _cachedHasUnread = null;
+    _onUpdate.add(null);
+  }
+
   final StreamController<void> onTimelineLoaded = StreamController.broadcast();
 
   late final List<RoomComponent<MatrixClient, MatrixRoom>> _components;
@@ -110,7 +122,10 @@ class MatrixRoom extends Room {
   int get notificationCount => _matrixRoom.notificationCount;
 
   @override
-  bool get hasUnreadMessages {
+  bool get hasUnreadMessages =>
+      _cachedHasUnread ??= _computeHasUnreadMessages();
+
+  bool _computeHasUnreadMessages() {
     // The matrix SDK's isUnread is driven by notification_count, which some
     // homeservers (notably Continuwuity) don't send, so the unread indicator
     // never lights up there (#76). Fall back to receipt-based detection
@@ -119,9 +134,7 @@ class MatrixRoom extends Room {
     if (_matrixRoom.isUnread) return true;
     // Use the cached pushRule getter, not _matrixRoom.pushRuleState: the latter
     // scans all of the account's push rules and is expensive enough that it's
-    // deliberately cached (see _pushRule). hasUnreadMessages is called for every
-    // room on every list rebuild, so calling it uncached starves the UI thread
-    // and makes avatars/images load very slowly.
+    // deliberately cached (see _pushRule).
     if (pushRule == PushRule.dontNotify) {
       return false;
     }
@@ -205,7 +218,7 @@ class MatrixRoom extends Room {
 
     await _matrixRoom.setPushRuleState(newRule);
     _pushRule = _matrixRoom.pushRuleState;
-    _onUpdate.add(null);
+    _notifyUpdate();
   }
 
   @override
@@ -295,7 +308,7 @@ class MatrixRoom extends Room {
       }
     }
 
-    _onUpdate.add(null);
+    _notifyUpdate();
   }
 
   // ignore: deprecated_member_use
@@ -315,10 +328,10 @@ class MatrixRoom extends Room {
       var event = convertEvent(roomEvent);
       if (lastEvent == null) {
         lastEvent = event;
-        _onUpdate.add(null);
+        _notifyUpdate();
       } else if (event.originServerTs.isAfter(lastEvent!.originServerTs)) {
         lastEvent = event;
-        _onUpdate.add(null);
+        _notifyUpdate();
       }
 
       if (event is TimelineEventMessage ||
@@ -326,10 +339,10 @@ class MatrixRoom extends Room {
           event is TimelineEventEmote) {
         if (lastMessage == null) {
           lastMessage = event;
-          _onUpdate.add(null);
+          _notifyUpdate();
         } else if (event.originServerTs.isAfter(lastMessage!.originServerTs)) {
           lastMessage = event;
-          _onUpdate.add(null);
+          _notifyUpdate();
         }
       }
     }
@@ -627,7 +640,7 @@ class MatrixRoom extends Room {
   @override
   Future<void> setDisplayName(String newName) async {
     _displayName = newName;
-    _onUpdate.add(null);
+    _notifyUpdate();
     await _matrixRoom.setName(newName);
   }
 
@@ -866,7 +879,7 @@ class MatrixRoom extends Room {
     if (event.state.type == "m.room.name" ||
         event.state.type == "m.room.avatar" ||
         event.state.type == "m.room.topic") {
-      _onUpdate.add(null);
+      _notifyUpdate();
     }
   }
 
@@ -924,7 +937,7 @@ class MatrixRoom extends Room {
 
     if (update == null) return;
 
-    _onUpdate.add(null);
+    _notifyUpdate();
   }
 
   @override
@@ -1027,7 +1040,7 @@ class MatrixRoom extends Room {
   @override
   Future<void> setTopic(String topic) async {
     await matrixRoom.setDescription(topic);
-    _onUpdate.add(null);
+    _notifyUpdate();
   }
 
   @override
@@ -1043,7 +1056,7 @@ class MatrixRoom extends Room {
 
     await matrixRoom.setAvatar(matrix.MatrixFile(bytes: bytes, name: name));
     _avatar = MemoryImage(bytes);
-    _onUpdate.add(null);
+    _notifyUpdate();
   }
 
   @override
