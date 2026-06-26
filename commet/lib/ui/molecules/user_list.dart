@@ -61,6 +61,15 @@ class RoomMemberList extends StatefulWidget {
                   if (role != null) {
                     await room.setMemberRole(userId, role);
                     onUserRoleChanged?.call();
+
+                    // Confirm the change applied. Failures already surface as
+                    // an error dialog via ErrorUtils.tryRun, so a role edit is
+                    // never silently a no-op (#18).
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("$userDisplayName is now ${role.name}"),
+                      ));
+                    }
                   }
                 });
               }),
