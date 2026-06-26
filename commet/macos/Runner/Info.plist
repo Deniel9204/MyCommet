@@ -33,5 +33,12 @@
 	     (Twemoji COLR / Noto Color Emoji CBDT), so emoji are invisible. -->
 	<key>FLTEnableImpeller</key>
 	<false/>
+	<!-- WebRTC requests the microphone/camera when a call starts. macOS hard-
+	     kills the app (TCC SIGABRT) if it touches these without a usage
+	     description, so they must be present even for voice-only calls. -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Commet needs access to your microphone for voice and video calls.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Commet needs access to your camera for video calls.</string>
 </dict>
 </plist>
