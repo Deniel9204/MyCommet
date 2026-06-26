@@ -8,6 +8,9 @@ env:
   USER2_NAME: bob
   USER2_PW: CanWeFixIt
   PROJECT_PATH: commet
+  # Harden the native Rust build against transient crates.io fetch failures
+  # (e.g. "failed to get png as a dependency of image") that flake CI.
+  CARGO_NET_RETRY: "10"
 
 jobs:
   integration-test:
