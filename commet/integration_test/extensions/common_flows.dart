@@ -86,9 +86,9 @@ extension CommonFlows on WidgetTester {
     await waitFor(() => find.byType(TextField).evaluate().length >= 3);
 
     await enterText(find.byType(TextField).at(1), username);
-    await pumpAndSettle();
+    await pump();
     await enterText(find.byType(TextField).at(2), password);
-    await pumpAndSettle();
+    await pump();
 
     await tap(find.widgetWithText(tiamat.Button, T.current.promptSubmitLogin));
     // Logging in shows a progress spinner; pump instead of pumpAndSettle.
@@ -109,9 +109,9 @@ extension CommonFlows on WidgetTester {
     await waitFor(() => find.byType(TextField).evaluate().length >= 3);
 
     await enterText(find.byType(TextField).at(1), userTwoName);
-    await pumpAndSettle();
+    await pump();
     await enterText(find.byType(TextField).at(2), userTwoPassword);
-    await pumpAndSettle();
+    await pump();
 
     await tap(find.widgetWithText(tiamat.Button, T.current.promptSubmitLogin));
     // Logging in shows a progress spinner; pump instead of pumpAndSettle.
