@@ -551,3 +551,57 @@ jobs:
         with:
           name: commet-web.tar.gz
           path: commet/build/commet-web.tar.gz
+
+
+  release-macos:
+    # macos-26 ships Xcode 26 (needed for connectivity_plus' macOS 26 SDK symbol;
+    # see build.yml's build-macos). Ad-hoc signed (CODE_SIGN_IDENTITY = "-"), so
+    # no Apple secrets needed; users will see a Gatekeeper prompt on first open.
+    runs-on: macos-26
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.8.0
+        with:
+          flutter-version: '3.41.9'
+          channel: 'stable'
+
+      - name: Configure Flutter
+        run: flutter config --enable-macos-desktop
+
+      - name: Code Generation
+        run: |
+          cd $PROJECT_PATH
+          dart run scripts/codegen.dart
+
+      - name: Build macOS App
+        run: |
+          cd $PROJECT_PATH
+          dart run scripts/build_release.dart --platform macos --version_tag ${{ github.event.release.tag_name || 'v0.0.0-artifact' }} --git_hash ${{ github.sha }}
+
+      - name: Create archive
+        run: |
+          cd $PROJECT_PATH/build/macos/Build/Products/Release
+          ditto -c -k --keepParent commet.app commet-macos.zip
+
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: commet/build/macos/Build/Products/Release/commet-macos.zip
+          asset_name: commet-macos.zip
+          asset_content_type: application/zip
+
+      - name: Upload Artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: commet-macos.zip
+          path: commet/build/macos/Build/Products/Release/commet-macos.zip
