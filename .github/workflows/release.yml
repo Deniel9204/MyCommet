@@ -6,6 +6,12 @@ on:
       - created
   workflow_dispatch:
 
+# Needed so the per-job "Upload to release" steps (actions/upload-release-asset)
+# can attach assets — without this the GITHUB_TOKEN is read-only and uploads
+# fail with "Resource not accessible by integration".
+permissions:
+  contents: write
+
 env:
   PROJECT_PATH: commet
   # Harden the native Rust build against transient crates.io fetch failures
