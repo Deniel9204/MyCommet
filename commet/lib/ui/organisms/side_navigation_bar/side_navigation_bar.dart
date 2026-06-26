@@ -7,6 +7,7 @@ import 'package:commet/client/components/sidebar_component/sidebar_entries_compo
 import 'package:commet/config/layout_config.dart';
 import 'package:commet/ui/molecules/space_selector.dart';
 import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar_direct_messages.dart';
+import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar_rooms.dart';
 import 'package:commet/ui/pages/get_or_create_room/get_or_create_room.dart';
 import 'package:commet/utils/common_strings.dart';
 import 'package:commet/utils/event_bus.dart';
@@ -196,6 +197,11 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                         context),
                     SideNavigationBarDirectMessages(
                       _clientManager.directMessages,
+                      onRoomTapped: widget.onDirectMessageSelected,
+                    ),
+                    SideNavigationBarRooms(
+                      _clientManager,
+                      filterClient: filterClient,
                       onRoomTapped: widget.onDirectMessageSelected,
                     ),
                   ],
