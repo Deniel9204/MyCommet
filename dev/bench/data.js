@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782477360225,
+  "lastUpdate": 1782482085457,
   "repoUrl": "https://github.com/Deniel9204/MyCommet",
   "entries": {
     "Benchmark": [
@@ -167,6 +167,90 @@ window.BENCHMARK_DATA = {
           {
             "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
             "value": 6.503,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "5380799+Deniel9204@users.noreply.github.com",
+            "name": "Akumul",
+            "username": "Deniel9204"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3867ad9782b6303a3a0afeae7c9dfadaff7dafa6",
+          "message": "Fix unread indicator on homeservers without notification counts (#239)\n\nThe unread indicator used the matrix SDK's Room.isUnread, which is\n`notificationCount > 0 || markedUnread`. notification_count isn't sent by every\nhomeserver (notably Continuwuity), so the indicator never appeared there.\n\nFall back to the SDK's receipt-based hasNewMessages (which compares our own\nread receipt / its timestamp to the last event) when isUnread is false, so\nunread is detected from read receipts rather than server-provided counts. Mute\nis still respected: rooms set to dontNotify don't surface unread this way.",
+          "timestamp": "2026-06-26T15:41:40+02:00",
+          "tree_id": "9fb9632a47c755fcf0ea01226e05626ed43d3bdf",
+          "url": "https://github.com/Deniel9204/MyCommet/commit/3867ad9782b6303a3a0afeae7c9dfadaff7dafa6"
+        },
+        "date": 1782482084812,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Build Count",
+            "value": 504,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Body Build Count",
+            "value": 102,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Reply Body Build Count",
+            "value": 90,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Url Preview Build Count",
+            "value": 0,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Build Time",
+            "value": 1.5542941176470588,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Raster Time",
+            "value": 7.407030303030301,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Build Time",
+            "value": 3.297,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Raster Time",
+            "value": 12.456,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Build Time",
+            "value": 3.297,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Build Time",
+            "value": 3.297,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Raster Time",
+            "value": 12.456,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
+            "value": 10.07,
             "unit": "ms"
           }
         ]
