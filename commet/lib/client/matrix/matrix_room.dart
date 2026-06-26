@@ -739,7 +739,9 @@ class MatrixRoom extends Room {
     // requests below. This is the fast path: one backup fetch instead of a
     // to-device round-trip per session.
     final keyManager = _matrixRoom.client.encryption?.keyManager;
-    if (keyManager != null && keyManager.enabled && await keyManager.isCached()) {
+    if (keyManager != null &&
+        keyManager.enabled &&
+        await keyManager.isCached()) {
       try {
         await keyManager.loadAllKeysFromRoom(_matrixRoom.id);
       } catch (e, s) {
@@ -974,22 +976,26 @@ class MatrixRoom extends Room {
 
   @override
   List<Role> get availableRoles {
-    final roles = <MatrixRole>[
-      MatrixRole(100),
-      MatrixRole(50),
-      if (getComponent<MatrixCalendarRoomComponent>()?.hasCalendar == true)
-        MatrixRole(25,
-            nameOverride: "Calendar Moderator",
-            iconOverride: Icons.calendar_month),
-      MatrixRole(0),
-    ];
+    final hasCalendar =
+        getComponent<MatrixCalendarRoomComponent>()?.hasCalendar == true;
 
-    // You can't grant a power level higher than your own, so don't offer roles
-    // above it — picking one would just be rejected by the homeserver (#18).
-    final assignable = assignableRoleLevels(
-            roles.map((r) => r.powerLevel), _matrixRoom.ownPowerLevel)
-        .toSet();
-    return roles.where((r) => assignable.contains(r.powerLevel)).toList();
+    // Offer the Owner (150) tier in room version 12+ (where it exists) and skip
+    // roles above our own power level — the homeserver would just reject them,
+    // which previously made the edit silently no-op (#18).
+    final levels = availableRoleLevels(
+      int.tryParse(_matrixRoom.roomVersion ?? "1"),
+      _matrixRoom.ownPowerLevel,
+      hasCalendar: hasCalendar,
+    );
+
+    return levels.map((level) {
+      if (level == 25) {
+        return MatrixRole(25,
+            nameOverride: "Calendar Moderator",
+            iconOverride: Icons.calendar_month);
+      }
+      return MatrixRole(level);
+    }).toList();
   }
 
   @override
