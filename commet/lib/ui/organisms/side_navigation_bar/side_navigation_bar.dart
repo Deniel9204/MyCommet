@@ -7,6 +7,7 @@ import 'package:commet/client/components/sidebar_component/sidebar_entries_compo
 import 'package:commet/config/layout_config.dart';
 import 'package:commet/ui/molecules/space_selector.dart';
 import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar_direct_messages.dart';
+import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar_rooms_button.dart';
 import 'package:commet/ui/pages/get_or_create_room/get_or_create_room.dart';
 import 'package:commet/utils/common_strings.dart';
 import 'package:commet/utils/event_bus.dart';
@@ -25,6 +26,7 @@ class SideNavigationBar extends StatefulWidget {
       this.onDirectMessageSelected,
       this.onSettingsSelected,
       this.onHomeSelected,
+      this.onRoomsSelected,
       this.extraEntryBuilders,
       this.clearSpaceSelection});
 
@@ -38,6 +40,7 @@ class SideNavigationBar extends StatefulWidget {
   final void Function()? clearSpaceSelection;
   final void Function(Room room)? onDirectMessageSelected;
   final void Function()? onHomeSelected;
+  final void Function()? onRoomsSelected;
   final void Function()? onSettingsSelected;
 
   @override
@@ -75,6 +78,10 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
 
   String get promptAddSpace => Intl.message("Add Space",
       name: "promptAddSpace", desc: "Prompt to add a new space");
+
+  String get promptRooms => Intl.message("Rooms",
+      name: "promptRooms",
+      desc: "Tooltip for the rail button that lists rooms not in a space");
 
   late List<SidebarEntry> items;
 
@@ -197,6 +204,19 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                     SideNavigationBarDirectMessages(
                       _clientManager.directMessages,
                       onRoomTapped: widget.onDirectMessageSelected,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: SideNavigationBar.tooltip(
+                          promptRooms,
+                          SideNavigationBarRoomsButton(
+                            _clientManager,
+                            filterClient: filterClient,
+                            onTap: () {
+                              widget.onRoomsSelected?.call();
+                            },
+                          ),
+                          context),
                     ),
                   ],
                 ),
