@@ -10,6 +10,7 @@ import 'package:commet/ui/organisms/background_task_view/background_task_view_co
 import 'package:commet/ui/organisms/home_screen/home_screen.dart';
 import 'package:commet/ui/organisms/overlay_windows/overlay_window_manager.dart';
 import 'package:commet/ui/organisms/home_screen/important_rooms_list.dart';
+import 'package:commet/ui/organisms/home_screen/non_space_rooms_list.dart';
 import 'package:commet/ui/organisms/room_quick_access_menu/room_quick_access_menu_desktop.dart';
 import 'package:commet/ui/organisms/room_side_panel/room_side_panel.dart';
 import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar.dart';
@@ -72,6 +73,9 @@ class MainPageViewDesktop extends StatelessWidget {
                                   },
                                   onHomeSelected: () {
                                     state.selectHome();
+                                  },
+                                  onRoomsSelected: () {
+                                    state.selectRooms();
                                   },
                                   clearSpaceSelection: () {
                                     state.clearSpaceSelection();
@@ -263,6 +267,17 @@ class MainPageViewDesktop extends StatelessWidget {
   }
 
   Widget buildRoomPicker(BuildContext context) {
+    if (state.currentView == MainPageSubView.rooms) {
+      return ScaledSafeArea(
+        top: true,
+        bottom: false,
+        child: SizedBox(
+          height: double.infinity,
+          child: NonSpaceRoomsList(state: state),
+        ),
+      );
+    }
+
     if (state.currentSpace == null) {
       return ScaledSafeArea(
         top: true,
@@ -280,7 +295,10 @@ class MainPageViewDesktop extends StatelessWidget {
   }
 
   Widget mainView(BuildContext context) {
-    if (state.currentView == MainPageSubView.home)
+    // The rooms view differs from home only in the room picker column; the main
+    // area shows the same dashboard (or the selected room).
+    if (state.currentView == MainPageSubView.home ||
+        state.currentView == MainPageSubView.rooms)
       return Flexible(child: homeView());
     if (state.currentRoom != null && state.currentView != MainPageSubView.home)
       return roomChatView();

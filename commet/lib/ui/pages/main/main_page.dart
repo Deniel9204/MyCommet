@@ -58,6 +58,7 @@ class MainPage extends StatefulWidget {
 enum MainPageSubView {
   space,
   home,
+  rooms,
 }
 
 class MainPageState extends State<MainPage> {
@@ -391,6 +392,21 @@ class MainPageState extends State<MainPage> {
       _currentView = MainPageSubView.home;
       clearSpaceSelection();
     });
+  }
+
+  /// Shows the list of rooms that aren't part of any space (#13). Clears any
+  /// selected space/room so the picker switches to the rooms list, but keeps
+  /// the account filter so it respects the mix/selected-account view.
+  void selectRooms() {
+    onRoomUpdateSubscription?.cancel();
+    setState(() {
+      _currentRoom = null;
+      _currentSpace = null;
+      _currentView = MainPageSubView.rooms;
+    });
+
+    EventBus.onSelectedRoomChanged.add(null);
+    EventBus.onSelectedSpaceChanged.add(null);
   }
 
   void onOpenRoomSignal(RoomOpenArgs args) async {

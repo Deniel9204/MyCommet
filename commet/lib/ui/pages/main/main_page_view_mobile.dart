@@ -11,6 +11,7 @@ import 'package:commet/ui/organisms/background_task_view/background_task_view_co
 import 'package:commet/ui/organisms/home_screen/home_screen.dart';
 import 'package:commet/ui/organisms/overlay_windows/overlay_window_manager.dart';
 import 'package:commet/ui/organisms/home_screen/important_rooms_list.dart';
+import 'package:commet/ui/organisms/home_screen/non_space_rooms_list.dart';
 import 'package:commet/ui/organisms/room_members_list/room_members_list.dart';
 import 'package:commet/ui/organisms/room_side_panel/room_side_panel.dart';
 import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar.dart';
@@ -208,6 +209,9 @@ class _MainPageViewMobileState extends State<MainPageViewMobile> {
                         onHomeSelected: () {
                           widget.state.selectHome();
                         },
+                        onRoomsSelected: () {
+                          widget.state.selectRooms();
+                        },
                         onDirectMessageSelected: (room) {
                           widget.state.selectHome();
                           widget.state.selectRoom(room);
@@ -219,6 +223,8 @@ class _MainPageViewMobileState extends State<MainPageViewMobile> {
                 ),
                 if (widget.state.currentView == MainPageSubView.home)
                   directMessagesView(),
+                if (widget.state.currentView == MainPageSubView.rooms)
+                  roomsView(),
                 if (widget.state.currentView == MainPageSubView.space &&
                     widget.state.currentSpace != null)
                   spaceRoomSelector(newContext),
@@ -384,6 +390,26 @@ class _MainPageViewMobileState extends State<MainPageViewMobile> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget roomsView() {
+    return Flexible(
+      child: Tile.surfaceContainer(
+        caulkClipTopLeft: true,
+        caulkClipBottomLeft: true,
+        caulkPadRight: true,
+        caulkClipTopRight: true,
+        caulkClipBottomRight: true,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+          child: ScaledSafeArea(
+            top: true,
+            bottom: false,
+            child: NonSpaceRoomsList(state: widget.state),
           ),
         ),
       ),

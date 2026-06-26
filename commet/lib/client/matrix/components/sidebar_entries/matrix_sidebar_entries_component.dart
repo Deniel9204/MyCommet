@@ -59,8 +59,11 @@ class MatrixSidebarEntriesComponent
         var space = client.getSpace(id);
 
         if (space == null) {
-          Log.e("Could not find space for ordering!");
-          return;
+          // The account data can reference a space we're no longer in (e.g. we
+          // left it). Skip just that entry instead of aborting the whole load,
+          // which previously dropped ordering for every remaining space/group.
+          Log.w("Could not find space '$id' for ordering; skipping");
+          continue;
         }
 
         if (group != null) {
@@ -74,8 +77,6 @@ class MatrixSidebarEntriesComponent
             SidebarEntriesComponent.idToOrder.set(space.localId, order);
           }
         }
-
-        print(content);
       }
     } else {
       Log.w("Could not find any ordering data for spaces");

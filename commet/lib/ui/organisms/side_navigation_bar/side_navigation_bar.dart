@@ -25,6 +25,7 @@ class SideNavigationBar extends StatefulWidget {
       this.onDirectMessageSelected,
       this.onSettingsSelected,
       this.onHomeSelected,
+      this.onRoomsSelected,
       this.extraEntryBuilders,
       this.clearSpaceSelection});
 
@@ -38,6 +39,7 @@ class SideNavigationBar extends StatefulWidget {
   final void Function()? clearSpaceSelection;
   final void Function(Room room)? onDirectMessageSelected;
   final void Function()? onHomeSelected;
+  final void Function()? onRoomsSelected;
   final void Function()? onSettingsSelected;
 
   @override
@@ -75,6 +77,10 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
 
   String get promptAddSpace => Intl.message("Add Space",
       name: "promptAddSpace", desc: "Prompt to add a new space");
+
+  String get promptRooms => Intl.message("Rooms",
+      name: "promptRooms",
+      desc: "Tooltip for the rail button that lists rooms not in a space");
 
   late List<SidebarEntry> items;
 
@@ -198,6 +204,16 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                       _clientManager.directMessages,
                       onRoomTapped: widget.onDirectMessageSelected,
                     ),
+                    SideNavigationBar.tooltip(
+                        promptRooms,
+                        ImageButton(
+                          size: 70,
+                          icon: Icons.forum,
+                          onTap: () {
+                            widget.onRoomsSelected?.call();
+                          },
+                        ),
+                        context),
                   ],
                 ),
                 footer: Column(
