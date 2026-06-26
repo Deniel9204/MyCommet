@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782492665441,
+  "lastUpdate": 1782496541002,
   "repoUrl": "https://github.com/Deniel9204/MyCommet",
   "entries": {
     "Benchmark": [
@@ -671,6 +671,90 @@ window.BENCHMARK_DATA = {
           {
             "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
             "value": 8.821,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "5380799+Deniel9204@users.noreply.github.com",
+            "name": "Akumul",
+            "username": "Deniel9204"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d53007b276e1c68807d617480e53e02a2745409b",
+          "message": "Fix iOS bundle name casing + bump to 0.1.0 + add macOS to release (#245)\n\n* Fix iOS bundle name casing (Commet) and bump version to 0.1.0\n\n- iOS Info.plist CFBundleName was \"commet\" (lowercase) while CFBundleDisplayName\n  was already \"Commet\"; align CFBundleName to \"Commet\" so the name is\n  consistently cased everywhere iOS surfaces it.\n- Bump version 0.4.2+920 -> 0.1.0+1 for the fork's first tagged release.\n\n* Add macOS to the release (ad-hoc) + macOS display name\n\n- release.yml: add a release-macos job (macos-26 / Xcode 26, like build.yml's\n  build-macos). Builds via build_release.dart (which is platform-generic — bakes\n  version/hash/date), zips commet.app with ditto, uploads commet-macos.zip to\n  the release (and as an artifact on workflow_dispatch). Ad-hoc signed, no Apple\n  secrets; first-open shows a Gatekeeper prompt.\n- macOS Info.plist: add CFBundleDisplayName \"Commet\" so the menu/dock/About show\n  the cased name while the bundle stays commet.app (PRODUCT_NAME unchanged, no\n  build-path break).",
+          "timestamp": "2026-06-26T19:42:09+02:00",
+          "tree_id": "61fb0d9a3431723f7c7e7eb3556159abb964e8a3",
+          "url": "https://github.com/Deniel9204/MyCommet/commit/d53007b276e1c68807d617480e53e02a2745409b"
+        },
+        "date": 1782496539786,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Build Count",
+            "value": 505,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Body Build Count",
+            "value": 103,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Reply Body Build Count",
+            "value": 90,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Url Preview Build Count",
+            "value": 0,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Build Time",
+            "value": 1.5989117647058824,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Raster Time",
+            "value": 6.038812499999999,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Build Time",
+            "value": 4.412,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Raster Time",
+            "value": 7.872,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Build Time",
+            "value": 4.412,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Build Time",
+            "value": 4.412,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Raster Time",
+            "value": 7.872,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
+            "value": 7.067,
             "unit": "ms"
           }
         ]
