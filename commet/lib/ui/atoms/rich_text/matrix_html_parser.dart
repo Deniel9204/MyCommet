@@ -163,7 +163,6 @@ class _MatrixHtmlStateState extends State<MatrixHtmlState> {
             top: Margin(8),
             right: Margin.zero(),
           ),
-          whiteSpace: WhiteSpace.pre,
         ),
         "h1": Style.fromTextStyle(theme.headlineLarge!).copyWith(
           margin: Margins.all(0),
