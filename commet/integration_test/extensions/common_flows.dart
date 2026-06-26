@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:commet/config/app_config.dart';
-import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar.dart';
+import 'package:commet/ui/molecules/user_panel_settings.dart';
 import 'package:commet/ui/pages/login/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -56,6 +56,11 @@ extension CommonFlows on WidgetTester {
   }
 
   Future<void> clean() async {
+    // Unmount the app so its widgets dispose and cancel the sync/stream
+    // listeners that keep scheduling frames. Otherwise a frame stays pending at
+    // teardown and the live-test binding fails the test "after completion" (and
+    // then the next test with `!inTest`/`_pendingFrame`), cascading the suite.
+    await pumpWidget(const SizedBox());
     await fileCache?.close();
     await preferences.clear();
     await clearUserData();
@@ -81,9 +86,9 @@ extension CommonFlows on WidgetTester {
     await waitFor(() => find.byType(TextField).evaluate().length >= 3);
 
     await enterText(find.byType(TextField).at(1), username);
-    await pumpAndSettle();
+    await pump();
     await enterText(find.byType(TextField).at(2), password);
-    await pumpAndSettle();
+    await pump();
 
     await tap(find.widgetWithText(tiamat.Button, T.current.promptSubmitLogin));
     // Logging in shows a progress spinner; pump instead of pumpAndSettle.
@@ -104,9 +109,9 @@ extension CommonFlows on WidgetTester {
     await waitFor(() => find.byType(TextField).evaluate().length >= 3);
 
     await enterText(find.byType(TextField).at(1), userTwoName);
-    await pumpAndSettle();
+    await pump();
     await enterText(find.byType(TextField).at(2), userTwoPassword);
-    await pumpAndSettle();
+    await pump();
 
     await tap(find.widgetWithText(tiamat.Button, T.current.promptSubmitLogin));
     // Logging in shows a progress spinner; pump instead of pumpAndSettle.
@@ -145,11 +150,23 @@ extension CommonFlows on WidgetTester {
   }
 
   Future<void> openSettings(App app) async {
-    await dragUntilVisible(find.byKey(SideNavigationBar.settingsKey),
-        find.byType(SideNavigationBar), const Offset(0, 20));
+    // The app-settings button lives in the user panel (CurrentSessionPanel ->
+    // UserPanelSettings): an Icons.settings IconButton that opens
+    // AppSettingsPage. It's always visible on the desktop main page, so no
+    // dragging is needed. login()'s final waitFor uses skipPumpAndSettle, so on
+    // return the app may still be swapping LoginPage -> MainPage; wait for the
+    // panel to render first.
+    final settingsButton = find.descendant(
+      of: find.byType(UserPanelSettings),
+      matching: find.widgetWithIcon(tiamat.IconButton, Icons.settings),
+    );
 
-    await tap(find.byKey(SideNavigationBar.settingsKey));
+    await waitFor(() => settingsButton.evaluate().isNotEmpty);
 
-    await pumpAndSettle();
+    await tap(settingsButton);
+
+    // The settings page opens over the live app, which never fully settles;
+    // pump a bounded number of frames and let callers waitFor what they need.
+    await pumpBounded();
   }
 }
