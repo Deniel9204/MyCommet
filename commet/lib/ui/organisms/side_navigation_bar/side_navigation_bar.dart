@@ -7,6 +7,7 @@ import 'package:commet/client/components/sidebar_component/sidebar_entries_compo
 import 'package:commet/config/layout_config.dart';
 import 'package:commet/ui/molecules/space_selector.dart';
 import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar_direct_messages.dart';
+import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar_rooms_button.dart';
 import 'package:commet/ui/pages/get_or_create_room/get_or_create_room.dart';
 import 'package:commet/utils/common_strings.dart';
 import 'package:commet/utils/event_bus.dart';
@@ -204,16 +205,19 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                       _clientManager.directMessages,
                       onRoomTapped: widget.onDirectMessageSelected,
                     ),
-                    SideNavigationBar.tooltip(
-                        promptRooms,
-                        ImageButton(
-                          size: 70,
-                          icon: Icons.forum,
-                          onTap: () {
-                            widget.onRoomsSelected?.call();
-                          },
-                        ),
-                        context),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: SideNavigationBar.tooltip(
+                          promptRooms,
+                          SideNavigationBarRoomsButton(
+                            _clientManager,
+                            filterClient: filterClient,
+                            onTap: () {
+                              widget.onRoomsSelected?.call();
+                            },
+                          ),
+                          context),
+                    ),
                   ],
                 ),
                 footer: Column(

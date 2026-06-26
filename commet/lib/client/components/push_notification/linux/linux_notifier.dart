@@ -135,6 +135,9 @@ class LinuxNotifier implements Notifier {
     clientManager!.directMessages.highlightedRoomsList.onListUpdated
         .listen((_) => updateBadgeCount());
     clientManager!.onSpaceUpdated.stream.listen((_) => updateBadgeCount());
+    // Messages in rooms that aren't a space or DM don't fire the updates above,
+    // so refresh on every sync to keep the taskbar badge current (#13).
+    clientManager!.onSync.stream.listen((_) => updateBadgeCount());
 
     updateBadgeCount();
   }

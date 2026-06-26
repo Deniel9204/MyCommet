@@ -18,6 +18,14 @@ class NotificationUtils {
       notificationCount += dm.displayNotificationCount;
     }
 
+    // Rooms that aren't in a space (and aren't DMs) are counted by neither loop
+    // above, so unread messages in them never reached the taskbar/dock badge
+    // (#13). Include them too.
+    for (var room in clientManager!.singleRooms()) {
+      highlightedNotificationCount += room.displayHighlightedNotificationCount;
+      notificationCount += room.displayNotificationCount;
+    }
+
     return (highlightedNotificationCount, notificationCount);
   }
 }
