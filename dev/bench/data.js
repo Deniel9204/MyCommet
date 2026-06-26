@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782487983365,
+  "lastUpdate": 1782492665441,
   "repoUrl": "https://github.com/Deniel9204/MyCommet",
   "entries": {
     "Benchmark": [
@@ -587,6 +587,90 @@ window.BENCHMARK_DATA = {
           {
             "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
             "value": 6.215,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "5380799+Deniel9204@users.noreply.github.com",
+            "name": "Akumul",
+            "username": "Deniel9204"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2afced21285741c6160bc516ce4e50832ece68b6",
+          "message": "ci: raise CARGO_NET_RETRY to reduce flaky native-build failures (#244)\n\nThe native Rust build (flutter_rust_bridge / rust_lib_commet, the `image`\ncrate) intermittently fails CI with transient crates.io fetch errors like\n\"failed to get `png` as a dependency of package `image`\" — the same Linux build\nsucceeds on a re-run / in other workflows on the same commit. Set\nCARGO_NET_RETRY=10 (default 3) on every workflow that compiles Rust so cargo\nretries transient network failures instead of failing the job.",
+          "timestamp": "2026-06-26T18:38:18+02:00",
+          "tree_id": "fef881c70882cca129ff5ffd8c71a1237f63e1c4",
+          "url": "https://github.com/Deniel9204/MyCommet/commit/2afced21285741c6160bc516ce4e50832ece68b6"
+        },
+        "date": 1782492664712,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Build Count",
+            "value": 505,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Body Build Count",
+            "value": 103,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Reply Body Build Count",
+            "value": 90,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Url Preview Build Count",
+            "value": 0,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Build Time",
+            "value": 1.4960294117647057,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Raster Time",
+            "value": 6.629666666666667,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Build Time",
+            "value": 3.459,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Raster Time",
+            "value": 9.695,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Build Time",
+            "value": 3.459,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Build Time",
+            "value": 3.459,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Raster Time",
+            "value": 9.695,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
+            "value": 8.821,
             "unit": "ms"
           }
         ]
