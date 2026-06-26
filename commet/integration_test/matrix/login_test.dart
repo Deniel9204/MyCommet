@@ -42,7 +42,9 @@ void main() {
     // button only appear once the homeserver's login flow has loaded. Use the
     // shared homeserver getter so the http:// scheme is included.
     await tester.enterText(find.byType(TextField).at(0), tester.homeserver);
-    await tester.pumpAndSettle();
+    // The homeserver lookup shows a loading spinner, so pumpAndSettle would
+    // never settle; waitFor below pumps frames until the login flow loads.
+    await tester.pump();
 
     await tester.waitFor(() => find.byType(TextField).evaluate().length >= 3);
 
