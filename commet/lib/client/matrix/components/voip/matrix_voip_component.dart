@@ -170,8 +170,13 @@ class MatrixVoipComponent
     var servers = configuration['iceServers'] as List<dynamic>;
 
     if (servers.isEmpty) {
-      throw Exception(
-          "No Turn servers are configured, this call cannot be connected");
+      // Don't throw here: by this point the call's local media is already
+      // acquired, and aborting setup mid-way crashes the native WebRTC teardown
+      // on desktop (the no-TURN "Call Error" dialog -> Cancel path). Build the
+      // peer connection anyway — with no ICE servers the call simply fails to
+      // connect gracefully instead of taking the app down.
+      Log.w(
+          "No STUN/TURN servers configured; the call will likely fail to connect");
     }
 
     var pc = await webrtc.createPeerConnection(configuration, constraints);
@@ -212,11 +217,9 @@ class MatrixVoipComponent
     try {
       await voip.inviteToCall(room, callType, userId: userId);
     } catch (e, s) {
-      // Call setup can fail (e.g. the user declines the no-TURN fallback, so
-      // createPeerConnection throws "No Turn servers are configured"). This is
-      // invoked fire-and-forget from the UI, so an uncaught rejection becomes
-      // an unhandled async error and takes the app down on desktop. Surface it
-      // instead of crashing.
+      // startCall is invoked fire-and-forget from the UI, so any failure during
+      // call setup would otherwise surface as an unhandled async error and take
+      // the app down on desktop. Surface it via the log instead of crashing.
       Log.onError(e, s, content: "Failed to start call");
     }
   }
