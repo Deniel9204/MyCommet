@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782482085457,
+  "lastUpdate": 1782484001419,
   "repoUrl": "https://github.com/Deniel9204/MyCommet",
   "entries": {
     "Benchmark": [
@@ -251,6 +251,90 @@ window.BENCHMARK_DATA = {
           {
             "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
             "value": 10.07,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "5380799+Deniel9204@users.noreply.github.com",
+            "name": "Akumul",
+            "username": "Deniel9204"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d7c8e38c3667f293e26172609736e146bcc35a77",
+          "message": "Fix slow image loading: use cached push rule in hasUnreadMessages (#240)\n\nThe unread-indicator fix (#76) called _matrixRoom.pushRuleState directly in\nhasUnreadMessages. That getter scans the whole account's push rules and is\nexpensive enough that MatrixRoom already caches it in _pushRule (see the\n\"becoming an expensive operation for ui stuff\" note on the pushRule getter).\nhasUnreadMessages runs for every room on every list rebuild, so the uncached\ncall starved the UI thread and made space/room/avatar images load very slowly.\n\nUse the cached pushRule getter instead. Same unread behaviour, cheap per call.",
+          "timestamp": "2026-06-26T16:10:25+02:00",
+          "tree_id": "d143c7ad3a7a2a665b7c19a64a186f4d43ba8944",
+          "url": "https://github.com/Deniel9204/MyCommet/commit/d7c8e38c3667f293e26172609736e146bcc35a77"
+        },
+        "date": 1782484000162,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Build Count",
+            "value": 505,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Body Build Count",
+            "value": 103,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Reply Body Build Count",
+            "value": 90,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Url Preview Build Count",
+            "value": 0,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Build Time",
+            "value": 1.4946470588235297,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Raster Time",
+            "value": 5.256875,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Build Time",
+            "value": 3.757,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Raster Time",
+            "value": 6.299,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Build Time",
+            "value": 3.757,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Build Time",
+            "value": 3.757,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Raster Time",
+            "value": 6.299,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
+            "value": 5.857,
             "unit": "ms"
           }
         ]
