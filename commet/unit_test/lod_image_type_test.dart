@@ -4,8 +4,10 @@ import 'package:test/test.dart';
 void main() {
   group('LODImageType ordering', () {
     test('quality increases blurhash < thumbnail < fullres', () {
-      expect(LODImageType.blurhash.index, lessThan(LODImageType.thumbnail.index));
-      expect(LODImageType.thumbnail.index, lessThan(LODImageType.fullres.index));
+      expect(
+          LODImageType.blurhash.index, lessThan(LODImageType.thumbnail.index));
+      expect(
+          LODImageType.thumbnail.index, lessThan(LODImageType.fullres.index));
     });
   });
 
@@ -22,12 +24,15 @@ void main() {
     });
 
     test('thumbnail upgrades blurhash but not full-res', () {
-      expect(isHigherLod(LODImageType.thumbnail, LODImageType.blurhash), isTrue);
-      expect(isHigherLod(LODImageType.thumbnail, LODImageType.fullres), isFalse);
+      expect(
+          isHigherLod(LODImageType.thumbnail, LODImageType.blurhash), isTrue);
+      expect(
+          isHigherLod(LODImageType.thumbnail, LODImageType.fullres), isFalse);
     });
 
     test('blurhash never overwrites a higher level', () {
-      expect(isHigherLod(LODImageType.blurhash, LODImageType.thumbnail), isFalse);
+      expect(
+          isHigherLod(LODImageType.blurhash, LODImageType.thumbnail), isFalse);
       expect(isHigherLod(LODImageType.blurhash, LODImageType.fullres), isFalse);
     });
 

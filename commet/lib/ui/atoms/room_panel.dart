@@ -40,9 +40,7 @@ class _RoomPanelState extends State<RoomPanel> {
         return;
       }
 
-      presenceComponent
-          .getUserPresence(directMessagePartner!)
-          .then((s) {
+      presenceComponent.getUserPresence(directMessagePartner!).then((s) {
         if (mounted) {
           setState(() {
             presence = s;

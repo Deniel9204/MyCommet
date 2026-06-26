@@ -36,7 +36,8 @@ void main() {
     test('long body is truncated with an ellipsis', () {
       final long = 'a' * 250;
       expect(
-        buildMessageSemanticLabel(senderName: 'A', body: long, maxBodyLength: 200),
+        buildMessageSemanticLabel(
+            senderName: 'A', body: long, maxBodyLength: 200),
         'A: ${'a' * 200}…',
       );
     });

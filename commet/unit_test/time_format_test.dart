@@ -127,7 +127,8 @@ void main() {
 
   group('resolveUse24Hour', () {
     test('explicit 24-hour overrides system default', () {
-      expect(resolveUse24Hour(TimeFormatPreference.twentyFourHour, false), isTrue);
+      expect(
+          resolveUse24Hour(TimeFormatPreference.twentyFourHour, false), isTrue);
     });
 
     test('explicit 12-hour overrides system default', () {
@@ -148,7 +149,8 @@ void main() {
 
     test('feeds formatTimeOfDay correctly', () {
       final t = DateTime(2026, 6, 23, 14, 30);
-      final use24 = resolveUse24Hour(TimeFormatPreference.twentyFourHour, false);
+      final use24 =
+          resolveUse24Hour(TimeFormatPreference.twentyFourHour, false);
       expect(fmt(t, use24Hour: use24), '14:30');
       final use12 = resolveUse24Hour(TimeFormatPreference.twelveHour, true);
       expect(fmt(t, use24Hour: use12), '2:30 PM');
