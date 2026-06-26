@@ -110,7 +110,18 @@ class MatrixRoom extends Room {
   int get notificationCount => _matrixRoom.notificationCount;
 
   @override
-  bool get hasUnreadMessages => _matrixRoom.isUnread;
+  bool get hasUnreadMessages {
+    // The matrix SDK's isUnread is driven by notification_count, which some
+    // homeservers (notably Continuwuity) don't send, so the unread indicator
+    // never lights up there (#76). Fall back to receipt-based detection
+    // (hasNewMessages compares our read receipt to the last event), but keep
+    // respecting mute so muted rooms stay quiet.
+    if (_matrixRoom.isUnread) return true;
+    if (_matrixRoom.pushRuleState == matrix.PushRuleState.dontNotify) {
+      return false;
+    }
+    return _matrixRoom.hasNewMessages;
+  }
 
   late DateTime _lastStateEventTimestamp;
   @override
