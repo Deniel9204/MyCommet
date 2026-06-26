@@ -78,7 +78,7 @@ class _SideNavigationBarRoomsButtonState
       children: [
         ImageButton(
           size: widget.size,
-          icon: Icons.forum,
+          icon: Icons.meeting_room,
           onTap: () => widget.onTap?.call(),
         ),
         if (notificationCount > 0)
