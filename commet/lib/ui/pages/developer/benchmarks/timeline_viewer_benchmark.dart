@@ -27,7 +27,13 @@ class _BenchmarkTimelineViewerState extends State<BenchmarkTimelineViewer> {
           matrix.Profile(userId: '@benchy:matrix.org', displayName: 'benchy'));
 
       var room = client.createRoomWithData();
-      timeline = room.getBenchmarkTimeline();
+      // The client/timeline is built asynchronously, so we have to rebuild once
+      // it's ready — without setState the view stayed on the empty placeholder
+      // forever, so the benchmark never found a scrollable timeline to drive.
+      if (!mounted) return;
+      setState(() {
+        timeline = room.getBenchmarkTimeline();
+      });
     });
     super.initState();
   }

@@ -1,4 +1,6 @@
-on: 
+on:
+  push:
+    branches: [main]
   merge_group:
   pull_request:
   workflow_dispatch:
@@ -55,22 +57,34 @@ jobs:
           exit $INTEGRATION_TEST_EXIT_CODE
 
       - name: Upload Artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: result.mkv
           path: commet/video.mkv
 
-      - name: Store benchmark result - separate results repo
+      - name: Upload benchmark data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-result
+          path: commet/build/customSmallerIsBetter.json
+
+      # Track results in this fork's own gh-pages branch instead of the upstream
+      # commetchat/commet_benchmark_results repo, using the auto-provided
+      # GITHUB_TOKEN (no external secret needed). History is only pushed on
+      # main / merge_group; PR runs just compute the result and comment on
+      # regressions, so they never need write access to gh-pages.
+      - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: Benchmark
           tool: 'customSmallerIsBetter'
           output-file-path: commet/build/customSmallerIsBetter.json
-          github-token: ${{ secrets.BENCHMARK_ACTION_BOT_TOKEN }}
-          auto-push: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: ${{ github.event_name != 'pull_request' }}
           # Show alert with commit comment on detecting possible performance regression
           alert-threshold: '350%'
           comment-on-alert: true
           fail-on-alert: false
           summary-always: true
-          gh-repository: 'github.com/commetchat/commet_benchmark_results'

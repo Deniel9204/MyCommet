@@ -23,6 +23,13 @@ void main() {
     final listFinder = find.byType(Scrollable);
     final itemFinder = find.text(finalEventMessage);
 
+    // The benchmark client and timeline are created asynchronously, so wait for
+    // the scrollable timeline to actually appear before driving it (otherwise
+    // scrollUntilVisible throws "Bad state: No element").
+    for (var i = 0; i < 40 && listFinder.evaluate().isEmpty; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
     var reportKey = 'TimelineViewer Scrolling';
 
     await binding.traceAction(
