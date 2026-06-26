@@ -56,6 +56,11 @@ extension CommonFlows on WidgetTester {
   }
 
   Future<void> clean() async {
+    // Unmount the app so its widgets dispose and cancel the sync/stream
+    // listeners that keep scheduling frames. Otherwise a frame stays pending at
+    // teardown and the live-test binding fails the test "after completion" (and
+    // then the next test with `!inTest`/`_pendingFrame`), cascading the suite.
+    await pumpWidget(const SizedBox());
     await fileCache?.close();
     await preferences.clear();
     await clearUserData();

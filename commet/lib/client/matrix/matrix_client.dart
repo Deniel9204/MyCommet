@@ -241,10 +241,16 @@ class MatrixClient extends Client {
       // Web loads the wasm bindings from assets; native platforms must load the
       // bundled flutter_vodozemac framework instead (otherwise the main isolate
       // reports vodozemac missing even though E2EE is available).
-      if (BuildConfig.WEB) {
-        await vod.init(wasmPath: './assets/assets/vodozemac/');
-      } else {
-        await vodozemac.init();
+      //
+      // _checkSystem runs per client, but vodozemac wraps flutter_rust_bridge,
+      // whose init throws if called twice in a process. The integration suite
+      // creates a client per test, so skip init once it's already done.
+      if (!vod.isInitialized()) {
+        if (BuildConfig.WEB) {
+          await vod.init(wasmPath: './assets/assets/vodozemac/');
+        } else {
+          await vodozemac.init();
+        }
       }
       if (!vod.isInitialized()) {
         throw Exception("Vodozemac failed to initialize!");
