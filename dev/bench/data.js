@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782487219850,
+  "lastUpdate": 1782487238911,
   "repoUrl": "https://github.com/Deniel9204/MyCommet",
   "entries": {
     "Benchmark": [
@@ -419,6 +419,90 @@ window.BENCHMARK_DATA = {
           {
             "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
             "value": 6.491,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "5380799+Deniel9204@users.noreply.github.com",
+            "name": "Akumul",
+            "username": "Deniel9204"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d5d6339f73a5fe70b07c6d9fc4712aa9a469813f",
+          "message": "Cache per-room unread state (fixes remaining slow image loading) (#242)\n\n#240 stopped hasUnreadMessages from scanning push rules uncached, but it still\ncalled the SDK's hasNewMessages (lastEvent + its receipts) on every read for\nevery room. Because the room list rebuilds on scroll/hover/selection - not just\non sync - that recomputation kept stalling avatar/image loading.\n\nCache the computed unread state and invalidate it only when the room actually\nsignals an update. All the existing `_onUpdate.add(null)` callsites (sync, new\nevent, notification, room state, avatar, push-rule change, ...) now go through\n`_notifyUpdate()`, which clears the cache and then notifies. Between updates\n(e.g. while scrolling the room list) the value is served from cache, so the UI\nthread stays free for image decoding.",
+          "timestamp": "2026-06-26T17:07:41+02:00",
+          "tree_id": "f2afa9c9bd141d601f415a7a320972aba49bd7fe",
+          "url": "https://github.com/Deniel9204/MyCommet/commit/d5d6339f73a5fe70b07c6d9fc4712aa9a469813f"
+        },
+        "date": 1782487238133,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Build Count",
+            "value": 505,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Body Build Count",
+            "value": 103,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Reply Body Build Count",
+            "value": 90,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Timeline Event Message Url Preview Build Count",
+            "value": 0,
+            "unit": "Builds"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Build Time",
+            "value": 1.600294117647059,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Average Raster Time",
+            "value": 5.866468749999999,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Build Time",
+            "value": 3.516,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - Worst Raster Time",
+            "value": 7.067,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Build Time",
+            "value": 3.516,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Build Time",
+            "value": 3.516,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 99th Percentile Raster Time",
+            "value": 7.067,
+            "unit": "ms"
+          },
+          {
+            "name": "TimelineViewer Scrolling - 90th Percentile Raster Time",
+            "value": 6.856,
             "unit": "ms"
           }
         ]
