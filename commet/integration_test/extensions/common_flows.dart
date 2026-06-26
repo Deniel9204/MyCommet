@@ -74,7 +74,9 @@ extension CommonFlows on WidgetTester {
     // Enter the homeserver first; the username/password fields and the login
     // button only appear once the homeserver's login flow has loaded.
     await enterText(find.byType(TextField).at(0), homeserver);
-    await pumpAndSettle();
+    // The homeserver lookup shows a loading spinner, so pumpAndSettle would
+    // never settle; waitFor below pumps frames until the login flow loads.
+    await pump();
 
     await waitFor(() => find.byType(TextField).evaluate().length >= 3);
 
@@ -84,7 +86,8 @@ extension CommonFlows on WidgetTester {
     await pumpAndSettle();
 
     await tap(find.widgetWithText(tiamat.Button, T.current.promptSubmitLogin));
-    await pumpAndSettle();
+    // Logging in shows a progress spinner; pump instead of pumpAndSettle.
+    await pump();
 
     await waitFor(() => app.clientManager.isLoggedIn(),
         timeout: const Duration(seconds: 10), skipPumpAndSettle: true);
@@ -94,7 +97,9 @@ extension CommonFlows on WidgetTester {
   Future<void> loginUser2(App app) async {
     await waitFor(() => find.byType(LoginPage).evaluate().isNotEmpty);
     await enterText(find.byType(TextField).at(0), homeserver);
-    await pumpAndSettle();
+    // The homeserver lookup shows a loading spinner, so pumpAndSettle would
+    // never settle; waitFor below pumps frames until the login flow loads.
+    await pump();
 
     await waitFor(() => find.byType(TextField).evaluate().length >= 3);
 
@@ -104,7 +109,8 @@ extension CommonFlows on WidgetTester {
     await pumpAndSettle();
 
     await tap(find.widgetWithText(tiamat.Button, T.current.promptSubmitLogin));
-    await pumpAndSettle();
+    // Logging in shows a progress spinner; pump instead of pumpAndSettle.
+    await pump();
 
     await waitFor(() => app.clientManager.isLoggedIn(),
         timeout: const Duration(seconds: 10), skipPumpAndSettle: true);
