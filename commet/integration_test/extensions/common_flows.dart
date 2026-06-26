@@ -150,6 +150,11 @@ extension CommonFlows on WidgetTester {
   }
 
   Future<void> openSettings(App app) async {
+    // login()'s final waitFor uses skipPumpAndSettle, so on return the app may
+    // still be swapping LoginPage -> MainPage and the side nav isn't in the tree
+    // yet. Wait for it before dragging within it.
+    await waitFor(() => find.byType(SideNavigationBar).evaluate().isNotEmpty);
+
     await dragUntilVisible(find.byKey(SideNavigationBar.settingsKey),
         find.byType(SideNavigationBar), const Offset(0, 20));
 
