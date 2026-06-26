@@ -15,6 +15,9 @@ class MatrixPinnedMessagesComponent
 
   @override
   bool get canPinMessages =>
+      // canChangeStateEvent resolves ownPowerLevel, which does `client.userID!`
+      // and throws when there's no logged-in user (e.g. the render benchmark).
+      room.matrixRoom.client.userID != null &&
       room.matrixRoom.canChangeStateEvent(EventTypes.RoomPinnedEvents);
 
   @override
